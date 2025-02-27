@@ -74,10 +74,7 @@ namespace WebAPI.Controllers
                             user.File.CopyTo(fs);
                             // fs.Close();
                         }
-                    }
-
-                    //hash pwd
-                    
+                    }                    
                     
                     //add user 
                     UserDto newUser =_userService.AddItem(user);
@@ -124,7 +121,7 @@ namespace WebAPI.Controllers
         // PUT api/<UserController>/5
         [Authorize]
         [HttpPut("{id}")]
-        public UserDto Put(int id, [FromForm] UserDto updateUser)
+        public UserDto Put(int id, [FromBody] UserDto updateUser)
         {
             var userIdFromToken = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
