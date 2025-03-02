@@ -32,7 +32,6 @@ namespace WebAPI.Controllers
 
 
         // GET: api/<TalentController>
-        [Authorize]
         [HttpGet]
         public List<TalentDto> Get()
         {
@@ -40,7 +39,6 @@ namespace WebAPI.Controllers
         }
 
         // GET api/<TalentController>/5
-        [Authorize]
         [HttpGet("{id}")]
         public TalentDto Get(int id)
         {

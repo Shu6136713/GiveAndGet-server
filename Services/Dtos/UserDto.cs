@@ -27,9 +27,9 @@ namespace Services.Dtos
         public Gender Gender { get; set; }
         public string Desc { get; set; }
         public bool IsActive { get; set; } = false;
-        public string Profile { get; set; }
+        public string? Profile { get; set; }
         public byte[]? Image { get; set; }
-        public IFormFile File { get; set; }
+        public IFormFile? File { get; set; }
 
         public bool? IsAdmin { get; set; } = false;
 
@@ -38,4 +38,5 @@ namespace Services.Dtos
 
     }
 }
+
 

@@ -13,12 +13,9 @@ namespace server
 {
     public class Program
     {
-
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
-
 
             // Add services to the container.
             builder.Services.AddControllers();
@@ -38,55 +35,45 @@ namespace server
                 });
 
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
                 {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            new string[] {}
-        }
-    });
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        new string[] {}
+                    }
+                });
             });
 
-
-
-            //di database
-
-
+            // DI for database context and services
             builder.Services.AddServiceExtension();
-            builder.Services.AddRepository(); 
+            builder.Services.AddRepository();
             builder.Services.AddDbContext<IContext, GiveAndGetDataBase>();
-            //DI
-            //builder.Services.AddDbContext<GiveAndGetDB>(options =>
-            //    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-
-            //builder.Services.AddEntityFrameworkSqlServer()
-            // .AddDbContext<GiveAndGetDB>(options =>
-            //    options.UseSqlServer(builder.Configuration["Data:DefaultConnection:Connectionstring"]));
+            // JWT Authentication
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(option =>
-                    option.TokenValidationParameters = new TokenValidationParameters()
+                .AddJwtBearer(options =>
+                    options.TokenValidationParameters = new TokenValidationParameters()
                     {
                         ValidateAudience = true,
                         ValidateIssuer = true,
                         ValidateLifetime = true,
                         ValidIssuer = builder.Configuration["Jwt:Issuer"],
                         ValidAudience = builder.Configuration["Jwt:Audience"],
-                        IssuerSigningKey=new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
-
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
                     }
                 );
 
+            // CORS policy
             var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
-            builder.Services.AddCors(option =>
+            builder.Services.AddCors(options =>
             {
-                option.AddPolicy(
+                options.AddPolicy(
                     name: MyAllowSpecificOrigins,
                     policy =>
                     {
@@ -105,10 +92,9 @@ namespace server
 
             app.UseHttpsRedirection();
 
-            app.UseAuthorization();
             app.UseAuthentication();
+            app.UseAuthorization();
             app.UseCors(MyAllowSpecificOrigins);
-
 
             app.MapControllers();
 

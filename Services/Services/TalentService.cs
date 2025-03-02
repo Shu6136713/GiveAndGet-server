@@ -21,7 +21,7 @@ namespace Services.Services
             this._repository = repository;
             this._mapper = mapper;
         }
-
+       
         public TalentDto AddItem(TalentDto item)
         {
             return _mapper.Map<TalentDto>(_repository.AddItem(_mapper.Map<Talent>(item)));
