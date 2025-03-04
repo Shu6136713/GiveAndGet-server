@@ -49,6 +49,24 @@ namespace WebAPI.Controllers
         {
             return _userService.Get(id);
         }
+        [Authorize]  
+        [HttpGet("profile")]
+        public IActionResult GetProfile()
+        {
+            var userIdFromToken = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdFromToken))
+            {
+                return Unauthorized("Token is missing or invalid");
+            }
+
+            var user = _userService.Get(int.Parse(userIdFromToken));
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
+
+            return Ok(user); // החזר את המידע על המשתמש
+        }
 
         // POST api/<UserController>
         [HttpPost]
@@ -68,16 +86,22 @@ namespace WebAPI.Controllers
                 //profile img
                 if (user.File != null)
                     {
-                        var filePath = Path.Combine(_directory, user.File.FileName); //l:/...
-                        using (FileStream fs = new FileStream(filePath, FileMode.Create))
+                    if (!Directory.Exists(_directory))
+                    {
+                        Directory.CreateDirectory(_directory);
+                    }
+                    var filePath = Path.Combine(_directory, user.File.FileName); //l:/...
+                     using (FileStream fs = new FileStream(filePath, FileMode.Create))
                         {
                             user.File.CopyTo(fs);
                             // fs.Close();
-                        }
-                    }                    
-                    
-                    //add user 
-                    UserDto newUser =_userService.AddItem(user);
+                        }               
+                    user.Profile = filePath; // שמירת הנתיב ב-DTO
+
+                    }
+
+                //add user 
+                UserDto newUser =_userService.AddItem(user);
 
                     // save
                   //  transaction.Commit();
@@ -95,6 +119,7 @@ namespace WebAPI.Controllers
                 {
                     //cancel transaction in case of errors
                    // transaction.Rollback();
+                   //delete img
                     return StatusCode(500, $"An error occurred: {ex.Message}");
                 }
             //}
@@ -158,10 +183,26 @@ namespace WebAPI.Controllers
             UserDto user = _userService.Get(id);
             if (user != null && !string.IsNullOrEmpty(user.Profile))
             {
-                return File(user.Image, "image/jpeg"); 
+                if (System.IO.File.Exists(user.Profile))
+                {
+                    var fileBytes = System.IO.File.ReadAllBytes(user.Profile);
+                    return File(fileBytes, "image/jpeg");
+                }
+                return NotFound("Profile image not found");
             }
-            return NotFound();
+            return NotFound("User or image not found");
         }
+
+        //[HttpGet("profile-image/{id}")]
+        //public IActionResult GetProfileImage(int id)
+        //{
+        //    UserDto user = _userService.Get(id);
+        //    if (user != null && !string.IsNullOrEmpty(user.Profile))
+        //    {
+        //        return File(user.Image, "image/jpeg"); 
+        //    }
+        //    return NotFound();
+        //}
 
     }
 }
