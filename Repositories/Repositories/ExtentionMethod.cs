@@ -24,7 +24,7 @@ namespace Repositories.Repositories
             services.AddScoped<IRepository<Talent>, TalentRepository>();
             services.AddScoped<IRepository<TalentRequest>, TalentRequestRepository>();
             services.AddScoped<IRepository<User>, UserRepository>();
-
+            services.AddScoped<ITalentExtrensionRepository, TalentRepository>();
             return services;
         }
     }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Services.Dtos;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,5 +16,9 @@ namespace Services.Interfaces
         void Delete(int id);
 
 
+    }
+    public interface ITalentExtensionService : IService<TalentDto>
+    {
+        List<TalentDto> GetByParentCategory(int parentCategoryId);
     }
 }

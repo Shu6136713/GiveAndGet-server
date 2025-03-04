@@ -19,8 +19,11 @@ namespace Repositories.Entity
         public string Email { get; set; }
         public  string UserName { get; set; }
         public int Score { get; set; } = 0;
-        public ICollection<Talent>? TalensOffered { get; set; }
-        public ICollection<Talent>? TalentsWanted { get; set; }
+
+        // רשימות הכשרונות שהיוזר מציע ורוצה
+        public ICollection<Talent> TalensOffered { get; set; } = new List<Talent>();
+        public ICollection<Talent> TalentsWanted { get; set; } = new List<Talent>();
+
         public int Age { get; set; }
         public Gender Gender { get; set; }
         public string Desc { get; set; }

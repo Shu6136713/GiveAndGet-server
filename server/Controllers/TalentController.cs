@@ -14,15 +14,15 @@ namespace WebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class TalentController : ControllerBase, ITalentControllerService
+    public class TalentController : ControllerBase//, ITalentControllerService
     {
-        private readonly IService<TalentDto> _talentService;
+        private readonly ITalentExtensionService _talentService;
         private readonly IService<TalentRequestDto> _talentRequestService;
         //private readonly GiveAndGetDB _giveAndGetDB;
         
 
         public TalentController(
-            IService<TalentDto> talentService, 
+            ITalentExtensionService talentService, 
             IService<TalentRequestDto> talentRequestService)
         {
             _talentService = talentService;
@@ -43,6 +43,18 @@ namespace WebAPI.Controllers
         public TalentDto Get(int id)
         {
             return _talentService.Get(id);
+        }
+
+        // GET api/Talent/byParent/{parentId}
+        [HttpGet("byParent/{parentId}")]
+        public IActionResult GetByParentCategory(int parentId)
+        {
+            var talents = _talentService.GetByParentCategory(parentId);
+            if (talents == null)
+            {
+                return NotFound($"No talents found for parent ID {parentId}.");
+            }
+            return Ok(talents);
         }
 
         // POST api/<TalentController>
