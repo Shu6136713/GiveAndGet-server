@@ -11,12 +11,12 @@ using System.Threading.Tasks;
 
 namespace Services.Services
 {
-    public class TalentService : IService<TalentDto>
+    public class TalentService : ITalentExtensionService
     {
-        private readonly IRepository<Talent> _repository;
+        private readonly ITalentExtrensionRepository _repository;
         private readonly IMapper _mapper;
 
-        public TalentService(IRepository<Talent> repository, IMapper mapper)
+        public TalentService(ITalentExtrensionRepository repository, IMapper mapper)
         {
             this._repository = repository;
             this._mapper = mapper;
@@ -40,6 +40,11 @@ namespace Services.Services
         public List<TalentDto> GetAll()
         {
             return _mapper.Map<List<TalentDto>>(_repository.GetAll());
+        }
+        public List<TalentDto> GetByParentCategory(int parentCategoryId)
+        {
+            var talents = _repository.GetByParentId(parentCategoryId);
+            return _mapper.Map<List<TalentDto>>(talents);
         }
 
         public TalentDto Update(int id, TalentDto item)

@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Repositories.Repositories
 {
-    public class TalentRepository : IRepository<Talent>
+    public class TalentRepository : ITalentExtrensionRepository//IRepository<Talent>
     {
         private readonly IContext context;
 

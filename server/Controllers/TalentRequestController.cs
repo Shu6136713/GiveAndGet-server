@@ -44,7 +44,7 @@ namespace WebAPI.Controllers
         }
 
         // POST api/<TalentRequestController>
-        [Authorize(Roles="user")]
+        //[Authorize(Roles="user")]
         [HttpPost]
         public IActionResult Post([FromBody] TalentRequestDto req)
         {

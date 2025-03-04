@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
 using Repositories.Entity;
+using Repositories.Interfaces;
 using Repositories.Repositories;
 using Services.Dtos;
 using Services.Interfaces;
@@ -25,7 +26,7 @@ namespace Services.Services
             services.AddScoped<IService<TalentDto>, TalentService>();
             services.AddScoped<IService<TalentRequestDto>, TalentRequestService>();
             services.AddScoped<IService<UserDto>, UserService>();
-            
+            services.AddScoped<ITalentExtensionService, TalentService>();
             services.AddAutoMapper(typeof(MyMapper));
 
 

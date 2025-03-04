@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Repositories.Entity;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,5 +14,10 @@ namespace Repositories.Interfaces
         T AddItem(T item);
         T Update(int id, T entity);
         void Delete(int id);
+    }
+
+    public interface ITalentExtrensionRepository : IRepository<Talent>
+    {
+        List<Talent> GetByParentId(int parentId);
     }
 }
