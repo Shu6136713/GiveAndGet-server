@@ -28,7 +28,7 @@ namespace Services.Dtos
         public string Desc { get; set; }
         public bool IsActive { get; set; } = false;
         public string? Profile { get; set; }
-        public byte[]? Image { get; set; }
+        public string? ProfileImageUrl { get; set; } // נתיב התמונה
         public IFormFile? File { get; set; }
 
         public bool? IsAdmin { get; set; } = false;

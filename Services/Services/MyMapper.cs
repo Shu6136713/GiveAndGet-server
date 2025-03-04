@@ -17,8 +17,12 @@ namespace Services.Services
             // convert from server to client
             CreateMap<User, UserDto>()
                 .ForMember(
-                    dest => dest.Image,
-                    src => src.MapFrom(i => i.ProfileImage != null ? convertToByte(Environment.CurrentDirectory + "/Images/" + i.ProfileImage) : null));
+                    dest => dest.ProfileImageUrl,
+                    src => src.MapFrom(i => i.ProfileImage != null ? $"/api/User/profile-image/{i.Id}" : null))
+                .ForMember(
+                    dest => dest.Profile,
+                    src => src.MapFrom(i => i.ProfileImage));
+
             // convert from client to server
             CreateMap<UserDto, User>()
                 .ForMember(
@@ -32,15 +36,6 @@ namespace Services.Services
             CreateMap<Message, MessageDto>().ReverseMap();
             CreateMap<Talent, TalentDto>().ReverseMap();
             CreateMap<TalentRequest, TalentRequestDto>().ReverseMap();
-        }
-
-        public byte[]? convertToByte(string image)
-        {
-            if (System.IO.File.Exists(image))
-            {
-                return System.IO.File.ReadAllBytes(image);
-            }
-            return null;
         }
     }
 }
