@@ -61,7 +61,7 @@ namespace WebAPI.Controllers
 
                 string pwd = user.HashPwd;
                 if (!CheckIfValidatePwd(pwd))
-                    throw new Exception("password has to contain upper and lowwer case, number and char");
+                    return BadRequest("Password must contain upper and lower case letters, numbers, and special characters.");
                 string hashPwd = PasswordManagerService.HashPassword(pwd);
                 user.HashPwd = hashPwd;
 
