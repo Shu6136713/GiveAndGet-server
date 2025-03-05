@@ -21,8 +21,9 @@ namespace Services.Dtos
         public string Email { get; set; }
         public string UserName { get; set; }
         public int Score { get; set; } = 0;
-        public ICollection<Talent>? TalensOffered { get; set; }
-        public ICollection<Talent>? TalentsWanted { get; set; }
+        public ICollection<TalentUserDto>? Talents { get; set; }
+        //public ICollection<Talent>? TalensOffered { get; set; }
+        //public ICollection<Talent>? TalentsWanted { get; set; }
         public int Age { get; set; }
         public Gender Gender { get; set; }
         public string Desc { get; set; }

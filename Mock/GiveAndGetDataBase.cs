@@ -24,6 +24,7 @@ namespace Mock
         public DbSet<Message> Messages { get; set; }
         public DbSet<Talent> Talents { get; set; }
         public DbSet<TalentRequest> TalentRequests { get; set; }
+        public DbSet<TalentUser> TalentUsers { get; set; }
 
 
 
@@ -35,28 +36,9 @@ namespace Mock
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("server=sql;database=GiveAndGetDataBase;trusted_connection=true");
+            optionsBuilder.UseSqlServer("server=sql;database=GiveAndGetDataB;trusted_connection=true");
         }
 
-        //protected override void OnModelCreating(ModelBuilder modelBuilder)
-        //{
-        //    // הגדרת אינדקסים ייחודיים עבור המודל User
-        //    modelBuilder.Entity<User>()
-        //        .HasIndex(u => u.UserName)
-        //        .IsUnique();
-
-        //    modelBuilder.Entity<User>()
-        //        .HasIndex(u => u.Email)
-        //        .IsUnique();
-
-        //    modelBuilder.Entity<User>()
-        //        .HasIndex(u => u.PhoneNumber)
-        //        .IsUnique();
-
-        //    modelBuilder.Entity<User>()
-        //        .HasIndex(u => u.HashPwd)
-        //        .IsUnique();
-        //}
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // הגדרת אינדקסים ייחודיים עבור המודל User
@@ -72,17 +54,11 @@ namespace Mock
                 .HasIndex(u => u.PhoneNumber)
                 .IsUnique();
 
-            //    // טבלת ביניים לכשרונות שמוצעים
-            //    modelBuilder.Entity<User>()
-            //        .HasMany(u => u.TalentsOffered)
-            //        .WithMany()
-            //        .UsingEntity(j => j.ToTable("UserTalentsOffered"));
-
-            //    // טבלת ביניים לכשרונות שמחפשים
-            //    modelBuilder.Entity<User>()
-            //        .HasMany(u => u.TalentsWanted)
-            //        .WithMany()
-            //        .UsingEntity(j => j.ToTable("UserTalentsWanted"));
+            modelBuilder.Entity<User>()
+                .HasIndex(u => u.HashPwd)
+                .IsUnique();
+            modelBuilder.Entity<TalentUser>()
+           .HasKey(tu => new { tu.UserId, tu.TalentId });
         }
     }
 }

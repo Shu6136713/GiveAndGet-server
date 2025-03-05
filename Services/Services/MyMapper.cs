@@ -36,6 +36,7 @@ namespace Services.Services
             CreateMap<Message, MessageDto>().ReverseMap();
             CreateMap<Talent, TalentDto>().ReverseMap();
             CreateMap<TalentRequest, TalentRequestDto>().ReverseMap();
+            CreateMap<TalentUserDto, TalentUserDto>().ReverseMap();
         }
     }
 }

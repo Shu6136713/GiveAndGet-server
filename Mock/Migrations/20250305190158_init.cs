@@ -10,6 +10,20 @@ namespace Mock.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "Talents",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TalentName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ParentCategory = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Talents", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
                 {
@@ -74,6 +88,49 @@ namespace Mock.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Exchanges",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    User1Id = table.Column<int>(type: "int", nullable: false),
+                    User2Id = table.Column<int>(type: "int", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: true),
+                    Talent1Offered = table.Column<int>(type: "int", nullable: false),
+                    Talent2Offered = table.Column<int>(type: "int", nullable: false),
+                    DateCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DateCompleted = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Exchanges", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Exchanges_Talents_Talent1Offered",
+                        column: x => x.Talent1Offered,
+                        principalTable: "Talents",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Exchanges_Talents_Talent2Offered",
+                        column: x => x.Talent2Offered,
+                        principalTable: "Talents",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Exchanges_Users_User1Id",
+                        column: x => x.User1Id,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Exchanges_Users_User2Id",
+                        column: x => x.User2Id,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Messages",
                 columns: table => new
                 {
@@ -125,58 +182,25 @@ namespace Mock.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Talents",
+                name: "TalentUsers",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    TalentName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ParentCategory = table.Column<int>(type: "int", nullable: false),
-                    
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    TalentId = table.Column<int>(type: "int", nullable: false),
+                    IsOffered = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Talents", x => x.Id);                    
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Exchanges",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    User1Id = table.Column<int>(type: "int", nullable: false),
-                    User2Id = table.Column<int>(type: "int", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: true),
-                    Talent1Offered = table.Column<int>(type: "int", nullable: false),
-                    Talent2Offered = table.Column<int>(type: "int", nullable: false),
-                    DateCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    DateCompleted = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Exchanges", x => x.Id);
+                    table.PrimaryKey("PK_TalentUsers", x => new { x.UserId, x.TalentId });
                     table.ForeignKey(
-                        name: "FK_Exchanges_Talents_Talent1Offered",
-                        column: x => x.Talent1Offered,
+                        name: "FK_TalentUsers_Talents_TalentId",
+                        column: x => x.TalentId,
                         principalTable: "Talents",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Exchanges_Talents_Talent2Offered",
-                        column: x => x.Talent2Offered,
-                        principalTable: "Talents",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Exchanges_Users_User1Id",
-                        column: x => x.User1Id,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Exchanges_Users_User2Id",
-                        column: x => x.User2Id,
+                        name: "FK_TalentUsers_Users_UserId",
+                        column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -227,15 +251,10 @@ namespace Mock.Migrations
                 table: "TalentRequests",
                 column: "UserId");
 
-            //migrationBuilder.CreateIndex(
-            //    name: "IX_Talents_UserId",
-            //    table: "Talents",
-            //    column: "UserId");
-
-            //migrationBuilder.CreateIndex(
-            //    name: "IX_Talents_UserId1",
-            //    table: "Talents",
-            //    column: "UserId1");
+            migrationBuilder.CreateIndex(
+                name: "IX_TalentUsers_TalentId",
+                table: "TalentUsers",
+                column: "TalentId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Users_Email",
@@ -278,6 +297,9 @@ namespace Mock.Migrations
 
             migrationBuilder.DropTable(
                 name: "TalentRequests");
+
+            migrationBuilder.DropTable(
+                name: "TalentUsers");
 
             migrationBuilder.DropTable(
                 name: "Talents");

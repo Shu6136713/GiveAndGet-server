@@ -12,7 +12,7 @@ using Mock;
 namespace Mock.Migrations
 {
     [DbContext(typeof(GiveAndGetDataBase))]
-    [Migration("20250227205837_init")]
+    [Migration("20250305190158_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -161,17 +161,7 @@ namespace Mock.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("UserId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("UserId1")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.HasIndex("UserId1");
 
                     b.ToTable("Talents");
                 });
@@ -202,6 +192,26 @@ namespace Mock.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("TalentRequests");
+                });
+
+            modelBuilder.Entity("Repositories.Entity.TalentUser", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnType("int")
+                        .HasColumnOrder(0);
+
+                    b.Property<int>("TalentId")
+                        .HasColumnType("int")
+                        .HasColumnOrder(1);
+
+                    b.Property<bool>("IsOffered")
+                        .HasColumnType("bit");
+
+                    b.HasKey("UserId", "TalentId");
+
+                    b.HasIndex("TalentId");
+
+                    b.ToTable("TalentUsers");
                 });
 
             modelBuilder.Entity("Repositories.Entity.User", b =>
@@ -344,17 +354,6 @@ namespace Mock.Migrations
                     b.Navigation("To");
                 });
 
-            modelBuilder.Entity("Repositories.Entity.Talent", b =>
-                {
-                    b.HasOne("Repositories.Entity.User", null)
-                        .WithMany("TalensOffered")
-                        .HasForeignKey("UserId");
-
-                    b.HasOne("Repositories.Entity.User", null)
-                        .WithMany("TalentsWanted")
-                        .HasForeignKey("UserId1");
-                });
-
             modelBuilder.Entity("Repositories.Entity.TalentRequest", b =>
                 {
                     b.HasOne("Repositories.Entity.User", "User")
@@ -366,11 +365,28 @@ namespace Mock.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Repositories.Entity.TalentUser", b =>
+                {
+                    b.HasOne("Repositories.Entity.Talent", "Talent")
+                        .WithMany()
+                        .HasForeignKey("TalentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Repositories.Entity.User", "User")
+                        .WithMany("Talents")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Talent");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Repositories.Entity.User", b =>
                 {
-                    b.Navigation("TalensOffered");
-
-                    b.Navigation("TalentsWanted");
+                    b.Navigation("Talents");
                 });
 #pragma warning restore 612, 618
         }

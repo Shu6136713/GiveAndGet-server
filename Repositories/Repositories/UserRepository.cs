@@ -54,8 +54,7 @@ namespace Repositories.Repositories
             existingUser.Email = updatedUser.Email;
             existingUser.UserName = updatedUser.UserName;
             existingUser.Score = updatedUser.Score;
-            existingUser.TalensOffered = updatedUser.TalensOffered;
-            existingUser.TalentsWanted = updatedUser.TalentsWanted;
+            existingUser.Talents = updatedUser.Talents;
             existingUser.Age = updatedUser.Age;
             existingUser.Gender = updatedUser.Gender;
             existingUser.Desc = updatedUser.Desc;
@@ -80,13 +79,13 @@ namespace Repositories.Repositories
         // חיפוש משתמשים לפי כישרון מוצע
         public List<User> GetByOfferedTalent(int talentId)
         {
-            return _context.Users.Where(u => u.TalensOffered.Any(t => t.Id == talentId)).ToList();
+            return _context.Users.Where(u => u.Talents.Any(t => t.TalentId == talentId && t.IsOffered)).ToList();
         }
 
         // חיפוש משתמשים לפי כישרון נדרש
         public List<User> GetByWantedTalent(int talentId)
         {
-            return _context.Users.Where(u => u.TalentsWanted.Any(t => t.Id == talentId)).ToList();
+            return _context.Users.Where(u => u.Talents.Any(t => t.TalentId == talentId && !t.IsOffered)).ToList();
         }
     }
 }

@@ -159,7 +159,6 @@ namespace Mock.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    
                     b.HasKey("Id");
 
                     b.ToTable("Talents");
@@ -191,6 +190,26 @@ namespace Mock.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("TalentRequests");
+                });
+
+            modelBuilder.Entity("Repositories.Entity.TalentUser", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnType("int")
+                        .HasColumnOrder(0);
+
+                    b.Property<int>("TalentId")
+                        .HasColumnType("int")
+                        .HasColumnOrder(1);
+
+                    b.Property<bool>("IsOffered")
+                        .HasColumnType("bit");
+
+                    b.HasKey("UserId", "TalentId");
+
+                    b.HasIndex("TalentId");
+
+                    b.ToTable("TalentUsers");
                 });
 
             modelBuilder.Entity("Repositories.Entity.User", b =>
@@ -262,7 +281,7 @@ namespace Mock.Migrations
                     b.HasOne("Repositories.Entity.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("User");
@@ -273,7 +292,7 @@ namespace Mock.Migrations
                     b.HasOne("Repositories.Entity.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("User");
@@ -284,25 +303,25 @@ namespace Mock.Migrations
                     b.HasOne("Repositories.Entity.Talent", "Talent1")
                         .WithMany()
                         .HasForeignKey("Talent1Offered")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Repositories.Entity.Talent", "Talent2")
                         .WithMany()
                         .HasForeignKey("Talent2Offered")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Repositories.Entity.User", "User1")
                         .WithMany()
                         .HasForeignKey("User1Id")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Repositories.Entity.User", "User2")
                         .WithMany()
                         .HasForeignKey("User2Id")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Talent1");
@@ -319,13 +338,13 @@ namespace Mock.Migrations
                     b.HasOne("Repositories.Entity.User", "From")
                         .WithMany()
                         .HasForeignKey("FromId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Repositories.Entity.User", "To")
                         .WithMany()
                         .HasForeignKey("ToId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("From");
@@ -333,33 +352,39 @@ namespace Mock.Migrations
                     b.Navigation("To");
                 });
 
-            //modelBuilder.Entity("Repositories.Entity.Talent", b =>
-            //    {
-            //        b.HasOne("Repositories.Entity.User", null)
-            //            .WithMany("TalensOffered")
-            //            .HasForeignKey("UserId");
-
-            //        b.HasOne("Repositories.Entity.User", null)
-            //            .WithMany("TalentsWanted")
-            //            .HasForeignKey("UserId1");
-            //    });
-
             modelBuilder.Entity("Repositories.Entity.TalentRequest", b =>
                 {
                     b.HasOne("Repositories.Entity.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Repositories.Entity.TalentUser", b =>
+                {
+                    b.HasOne("Repositories.Entity.Talent", "Talent")
+                        .WithMany()
+                        .HasForeignKey("TalentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Repositories.Entity.User", "User")
+                        .WithMany("Talents")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Talent");
 
                     b.Navigation("User");
                 });
 
             modelBuilder.Entity("Repositories.Entity.User", b =>
                 {
-                    b.Navigation("TalensOffered");
-
-                    b.Navigation("TalentsWanted");
+                    b.Navigation("Talents");
                 });
 #pragma warning restore 612, 618
         }
