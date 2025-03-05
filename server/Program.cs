@@ -23,6 +23,9 @@ namespace server
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(c =>
             {
+                c.CustomSchemaIds(type => type.FullName); // משתמש בשם המלא של המחלקה כדי למנוע התנגשות
+
+                //token
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
 
                 // הוספת הגדרה לאימות JWT
