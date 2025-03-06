@@ -123,13 +123,21 @@ namespace WebAPI.Controllers
         // PUT api/<UserController>/5
         [Authorize]
         [HttpPut("{id}")]
-        public UserDto Put(int id, [FromBody] UserDto updateUser)
+        public UserDto Put(int id, [FromForm] UserDto updateUser)
         {
             var userIdFromToken = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
             if (userIdFromToken != id.ToString())
             {
                 throw new Exception("You cannot update user who is not yourself.");
+            }
+
+            if (!string.IsNullOrEmpty(updateUser.HashPwd))
+            {
+                if (!CheckIfValidatePwd(updateUser.HashPwd))
+                    throw new Exception("Password must contain upper and lower case letters, numbers, and special characters.");
+                string hashPwd = PasswordManagerService.HashPassword(updateUser.HashPwd);
+                updateUser.HashPwd = hashPwd;
             }
 
             if (updateUser.File != null)
