@@ -2,8 +2,6 @@
 using Services.Interfaces;
 using Services.Dtos;
 using System.Collections.Generic;
-using Mock;
-using WebAPI.Interfaces;
 using Services.Services;
 using Microsoft.AspNetCore.Authorization;
 
@@ -15,15 +13,17 @@ namespace WebAPI.Controllers
     {
         private readonly IService<TalentRequestDto> _talentRequestService;
         private readonly IService<TalentDto> _talentService;
-        //private readonly GiveAndGetDB _giveAndGetDB;
-        //private readonly ITalentControllerService _talentController;
-
+        private readonly EmailService _emailService;
+        private readonly IService<UserDto> _userService;
         public TalentRequestController(IService<TalentRequestDto> talentRequestService,
-             IService<TalentDto> talentService
-            )
+                                       IService<TalentDto> talentService,
+                                       IService<UserDto> userService,  
+                                       EmailService emailService)
         {
             _talentRequestService = talentRequestService;
             _talentService = talentService;
+            _userService = userService;
+            _emailService = emailService;
         }
 
 
@@ -43,27 +43,46 @@ namespace WebAPI.Controllers
             return _talentRequestService.Get(id);
         }
 
-        // POST api/<TalentRequestController>
-        //[Authorize(Roles="user")]
         [HttpPost]
         public IActionResult Post([FromBody] TalentRequestDto req)
         {
             try
             {
-                TalentRequestDto newReq = _talentRequestService.AddItem(req);
-                /*
-                 * 
-                 * sent email to manager
-                 * 
-                 * 
-                 */
-                return Ok(newReq);
+                TalentRequestDto newRequest = _talentRequestService.AddItem(req);
+                UserDto requestingUser = _userService.Get(newRequest.UserId);
+
+                string subject = $"משתמש {requestingUser.UserName} ביקש להוסיף כשרון למערכת.";
+                string body = "אנא הכנס בהקדם לדף ניהול בקשות ההוספה ואשר / דחה את הבקשה.\nיום נעים!";
+
+                NotifyAdmins(subject, body);
+
+                return Ok(newRequest);
             }
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = "An error occurred while processing your request.", error = ex.Message });
             }
         }
+
+        private void NotifyAdmins(string subject, string body)
+        {
+            List<UserDto> adminUsers = _userService.GetAll().Where(user => (bool)user.IsAdmin).ToList();
+            foreach (UserDto admin in adminUsers)
+            {
+                try
+                {
+                    _emailService.SendEmail(subject, body, admin.Email);
+                }
+                catch (Exception ex)
+                {
+                    // הודעת שגיאה במקרה של כשלון בשליחת המייל
+                    Console.WriteLine($"Error sending email to {admin.Email}: {ex.Message}");
+                    // אם רוצים, ניתן גם לשמור את השגיאה או להחזיר תשובה
+                }
+            }
+        }
+
+
 
         // PUT api/<TalentRequestController>/5
         [Authorize(Roles = "admin")]
