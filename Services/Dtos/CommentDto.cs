@@ -12,6 +12,8 @@ namespace Services.Dtos
         public string UserId { get; set; } 
         public string Content { get; set; }
 
+        public CommentDto() { }
+
         public CommentDto(string userId, string content)
         {
             UserId = userId;

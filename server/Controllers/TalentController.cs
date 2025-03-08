@@ -50,9 +50,9 @@ namespace WebAPI.Controllers
         public IActionResult GetByParentCategory(int parentId)
         {
             var talents = _talentService.GetByParentCategory(parentId);
-            if (talents == null)
+            if (talents == null || !talents.Any())
             {
-                return NotFound($"No talents found for parent ID {parentId}.");
+                return Ok(new List<TalentDto>()); // החזר מערך ריק אם לא נמצאו תתי-כישרונות
             }
             return Ok(talents);
         }

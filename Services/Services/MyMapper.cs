@@ -22,13 +22,11 @@ namespace Services.Services
                 .ForMember(
                     dest => dest.Profile,
                     src => src.MapFrom(i => i.ProfileImage));
-
             // convert from client to server
             CreateMap<UserDto, User>()
                 .ForMember(
                     dest => dest.ProfileImage,
-                    src => src.MapFrom(i => i.File != null ? i.File.FileName : "default_profile_image.png")); // Default profile image
-
+                    src => src.MapFrom(i => i.File != null ? i.File.FileName : "default_profile_image.png")); // Default profile image          
             // others - only from server to client
             CreateMap<Comment, CommentDto>().ReverseMap();
             CreateMap<Connection, ConnectionDto>().ReverseMap();
@@ -36,7 +34,7 @@ namespace Services.Services
             CreateMap<Message, MessageDto>().ReverseMap();
             CreateMap<Talent, TalentDto>().ReverseMap();
             CreateMap<TalentRequest, TalentRequestDto>().ReverseMap();
-            CreateMap<TalentUserDto, TalentUserDto>().ReverseMap();
+            CreateMap<TalentUser, TalentUserDto>().ReverseMap();
         }
     }
 }

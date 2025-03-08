@@ -9,19 +9,27 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using AutoMapper;
+using Repositories.Entity;
+using Repositories.Interfaces;
+using Services.Dtos;
+using Services.Interfaces;
+using System.Collections.Generic;
+using System.Linq;
+
 namespace Services.Services
 {
     public class TalentService : ITalentExtensionService
     {
-        private readonly ITalentExtrensionRepository _repository;
+        private readonly ITalentExtensionRepository _repository;
         private readonly IMapper _mapper;
 
-        public TalentService(ITalentExtrensionRepository repository, IMapper mapper)
+        public TalentService(ITalentExtensionRepository repository, IMapper mapper)
         {
             this._repository = repository;
             this._mapper = mapper;
         }
-       
+
         public TalentDto AddItem(TalentDto item)
         {
             return _mapper.Map<TalentDto>(_repository.AddItem(_mapper.Map<Talent>(item)));
@@ -41,6 +49,7 @@ namespace Services.Services
         {
             return _mapper.Map<List<TalentDto>>(_repository.GetAll());
         }
+
         public List<TalentDto> GetByParentCategory(int parentCategoryId)
         {
             var talents = _repository.GetByParentId(parentCategoryId);

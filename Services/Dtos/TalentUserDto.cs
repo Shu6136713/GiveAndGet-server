@@ -6,21 +6,21 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Repositories.Entity
+namespace Services.Dtos
 {
     public class TalentUserDto
     {
        
-        [Key]
+       // [Key]
         public int UserId { get; set; }
-        [Key]  
+        //[Key]  
         public int TalentId { get; set; }
         public bool IsOffered { get; set; }
       
-        [ForeignKey("UserId")]
-        public virtual User User { get; set; }
+        //[ForeignKey("UserId")]
+       // public virtual User User { get; set; }
         
-        [ForeignKey("TalentId")]
-        public Talent Talent  { get; set; }
+        //[ForeignKey("TalentId")]
+        //public Talent Talent  { get; set; }
     }
 }

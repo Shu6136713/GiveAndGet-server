@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Repositories.Entity;
 using Repositories.Interfaces;
 using Services.Dtos;
 using Services.Interfaces;
@@ -15,12 +17,14 @@ namespace WebAPI.Controllers
     public class UserController : ControllerBase
     {
         private readonly IService<UserDto> _userService;
+        private readonly IService<TalentUserDto> _talentUserService; 
         private readonly IContext context;
         public static string _directory = Path.Combine(Environment.CurrentDirectory, "Images");
 
-        public UserController(IService<UserDto> userService, IContext context)
+        public UserController(IService<UserDto> userService, IService<TalentUserDto> talentUserService, IContext context)
         {
             _userService = userService;
+            _talentUserService = talentUserService;
             this.context = context;
         }
 
@@ -64,7 +68,7 @@ namespace WebAPI.Controllers
 
         // POST api/<UserController>
         [HttpPost]
-        public IActionResult Post([FromForm] UserDto user) //register
+        public IActionResult Post([FromForm] UserDto user, [FromForm] List<TalentUserDto> talents)//register
         {
             try
             {
@@ -91,6 +95,20 @@ namespace WebAPI.Controllers
 
                 // add user
                 UserDto newUser = _userService.AddItem(user);
+                // Add talents to TalentUser table
+                if (talents != null)
+                {
+                    foreach (var talent in talents)
+                    {
+                        context.TalentUser.Add(new TalentUser
+                        {
+                            UserId = newUser.Id,
+                            TalentId = talent.TalentId,
+                            IsOffered = talent.IsOffered
+                        });
+                    }
+                    context.Save();
+                }
 
                 return Ok(newUser);
             }
@@ -99,6 +117,7 @@ namespace WebAPI.Controllers
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
         }
+
 
         private bool CheckIfValidatePwd(string pwd)
         {
@@ -123,7 +142,7 @@ namespace WebAPI.Controllers
         // PUT api/<UserController>/5
         [Authorize]
         [HttpPut("{id}")]
-        public UserDto Put(int id, [FromForm] UserDto updateUser)
+        public UserDto Put(int id, [FromForm] UserDto updateUser, [FromForm] List<TalentUserDto> talents)
         {
             var userIdFromToken = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
@@ -149,7 +168,25 @@ namespace WebAPI.Controllers
                 }
                 updateUser.Profile = updateUser.File.FileName;
             }
-            return _userService.Update(id, updateUser);
+            UserDto updatedUser = _userService.Update(id, updateUser);
+
+            if (talents != null)
+            {
+                var existingTalents = context.TalentUser.Where(t => t.UserId == id).ToList();
+                context.TalentUser.RemoveRange(existingTalents);
+                foreach (var talent in talents)
+                {
+                    context.TalentUser.Add(new TalentUser
+                    {
+                        UserId = id,
+                        TalentId = talent.TalentId,
+                        IsOffered = talent.IsOffered
+                    });
+                }
+                context.Save();
+            }
+
+            return updatedUser;
         }
 
         // DELETE api/<UserController>/5

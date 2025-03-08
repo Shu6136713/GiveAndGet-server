@@ -24,7 +24,7 @@ namespace Mock
         public DbSet<Message> Messages { get; set; }
         public DbSet<Talent> Talents { get; set; }
         public DbSet<TalentRequest> TalentRequests { get; set; }
-        public DbSet<TalentUser> TalentUsers { get; set; }
+        public DbSet<TalentUser> TalentUser { get; set; }
 
 
 

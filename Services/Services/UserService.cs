@@ -40,7 +40,7 @@ namespace Services.Services
         {
             return _mapper.Map<List<UserDto>>(_repository.GetAll());
         }
-
+        
         public UserDto Update(int id, UserDto item)
         {
             return _mapper.Map<UserDto>(_repository.Update(id, _mapper.Map<User>(item)));

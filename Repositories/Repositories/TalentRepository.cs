@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Repositories.Repositories
 {
-    public class TalentRepository : ITalentExtrensionRepository//IRepository<Talent>
+    public class TalentRepository : ITalentExtensionRepository
     {
         private readonly IContext context;
 
@@ -32,9 +32,9 @@ namespace Repositories.Repositories
             return context.Talents.Where(t => t.ParentCategory == parentId).ToList();
         }
 
-        public List<Talent> GetAll() // when parent is 0
+        public List<Talent> GetAll()
         {
-            return context.Talents.Where(t => t.ParentCategory == 0).ToList();
+            return context.Talents.ToList();
         }
 
         public Talent Update(int id, Talent entity)

@@ -54,7 +54,7 @@ namespace Repositories.Repositories
             existingUser.Email = updatedUser.Email;
             existingUser.UserName = updatedUser.UserName;
             existingUser.Score = updatedUser.Score;
-            existingUser.Talents = updatedUser.Talents;
+            //existingUser.Talents = updatedUser.Talents;
             existingUser.Age = updatedUser.Age;
             existingUser.Gender = updatedUser.Gender;
             existingUser.Desc = updatedUser.Desc;
@@ -79,13 +79,28 @@ namespace Repositories.Repositories
         // חיפוש משתמשים לפי כישרון מוצע
         public List<User> GetByOfferedTalent(int talentId)
         {
-            return _context.Users.Where(u => u.Talents.Any(t => t.TalentId == talentId && t.IsOffered)).ToList();
+            var userIds = _context.TalentUser
+                .Where(tu => tu.TalentId == talentId && tu.IsOffered)
+                .Select(tu => tu.UserId)
+                .ToList();
+
+            return _context.Users
+                .Where(u => userIds.Contains(u.Id))
+                .ToList();
         }
+
 
         // חיפוש משתמשים לפי כישרון נדרש
         public List<User> GetByWantedTalent(int talentId)
         {
-            return _context.Users.Where(u => u.Talents.Any(t => t.TalentId == talentId && !t.IsOffered)).ToList();
+            var userIds = _context.TalentUser
+                .Where(tu => tu.TalentId == talentId && !tu.IsOffered)
+                .Select(tu => tu.UserId)
+                .ToList();
+
+            return _context.Users
+                .Where(u => userIds.Contains(u.Id))
+                .ToList();
         }
     }
 }

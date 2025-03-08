@@ -19,7 +19,7 @@ namespace Repositories.Entity
         public string Email { get; set; }
         public  string UserName { get; set; }
         public int Score { get; set; } = 0;
-        public ICollection<TalentUser>? Talents { get; set; }
+        //public ICollection<TalentUser>? Talents { get; set; }
         public int Age { get; set; }
         public Gender Gender { get; set; }
         public string Desc { get; set; }

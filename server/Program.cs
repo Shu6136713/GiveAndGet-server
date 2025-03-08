@@ -80,7 +80,10 @@ namespace server
                     name: MyAllowSpecificOrigins,
                     policy =>
                     {
-                        policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+                        policy.WithOrigins("http://localhost:3000") // הוסף את הדומיין שלך כאן
+                              .AllowAnyMethod()
+                              .AllowAnyHeader()
+                              .AllowCredentials();
                     });
             });
 

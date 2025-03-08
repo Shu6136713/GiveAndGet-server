@@ -16,7 +16,7 @@ namespace Repositories.Interfaces
         void Delete(int id);
     }
 
-    public interface ITalentExtrensionRepository : IRepository<Talent>
+    public interface ITalentExtensionRepository : IRepository<Talent>
     {
         List<Talent> GetByParentId(int parentId);
     }
