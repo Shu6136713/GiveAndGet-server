@@ -148,7 +148,7 @@ namespace WebAPI.Controllers
         // PUT api/<UserController>/5
         [Authorize]
         [HttpPut("{id}")]
-        public UserDto Put(int id, [FromForm] UserDto updateUser, [FromForm] List<TalentUserDto> talents)
+        public UserDto Put(int id, [FromForm] UserDto updateUser, [FromForm] string talents)
         {
             var userIdFromToken = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
@@ -176,11 +176,16 @@ namespace WebAPI.Controllers
             }
             UserDto updatedUser = _userService.Update(id, updateUser);
 
-            if (talents != null)
+            if (!string.IsNullOrEmpty(talents) && talents != "[]")
             {
-                _talentUserService.AddTalentsForUser(talents);
+                List<TalentUserDto> talentList = JsonConvert.DeserializeObject<List<TalentUserDto>>(talents);
+                foreach (TalentUserDto t in talentList)
+                {
+                    t.UserId = updatedUser.Id;
+                }
+                Console.WriteLine(talentList[0].UserId);
+                _talentUserService.AddTalentsForUser(talentList);
             }
-            context.Save();
 
 
             return updatedUser;
