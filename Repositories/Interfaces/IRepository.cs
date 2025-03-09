@@ -20,4 +20,11 @@ namespace Repositories.Interfaces
     {
         List<Talent> GetByParentId(int parentId);
     }
+
+    public interface ITalentUserExtensionRepository : IRepository<TalentUser>
+    {
+        List<TalentUser> AddTalentsForUser(List<TalentUser> talents);
+        List<TalentUser> GetTalentsByUserId(int userId); // פונקציה להוספת כישרונות לפי מזהה משתמש
+
+    }
 }

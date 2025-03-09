@@ -1,4 +1,5 @@
-﻿using Services.Dtos;
+﻿using Repositories.Entity;
+using Services.Dtos;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,5 +21,11 @@ namespace Services.Interfaces
     public interface ITalentExtensionService : IService<TalentDto>
     {
         List<TalentDto> GetByParentCategory(int parentCategoryId);
+    }
+
+    public interface ITalentUserExtensionService : IService<TalentUserDto>
+    {
+        List<TalentUserDto> AddTalentsForUser(List<TalentUserDto> talents);
+        List<TalentUserDto> GetTalentsByUserId(int userId);
     }
 }

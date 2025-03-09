@@ -23,6 +23,7 @@ namespace Repositories.Repositories
             services.AddScoped<IRepository<User>, UserRepository>();
             services.AddScoped<IRepository<TalentUser>, TalentUserRepository>();
             services.AddScoped<ITalentExtensionRepository, TalentRepository>();
+            services.AddScoped<ITalentUserExtensionRepository, TalentUserRepository>();
             return services;
         }
     }

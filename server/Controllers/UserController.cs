@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using Repositories.Entity;
 using Repositories.Interfaces;
 using Services.Dtos;
@@ -17,11 +18,11 @@ namespace WebAPI.Controllers
     public class UserController : ControllerBase
     {
         private readonly IService<UserDto> _userService;
-        private readonly IService<TalentUserDto> _talentUserService; 
+        private readonly ITalentUserExtensionService _talentUserService;
         private readonly IContext context;
         public static string _directory = Path.Combine(Environment.CurrentDirectory, "Images");
 
-        public UserController(IService<UserDto> userService, IService<TalentUserDto> talentUserService, IContext context)
+        public UserController(IService<UserDto> userService, ITalentUserExtensionService talentUserService, IContext context)
         {
             _userService = userService;
             _talentUserService = talentUserService;
@@ -68,17 +69,23 @@ namespace WebAPI.Controllers
 
         // POST api/<UserController>
         [HttpPost]
-        public IActionResult Post([FromForm] UserDto user, [FromForm] List<TalentUserDto> talents)//register
+        public IActionResult Post([FromForm] UserDto user, [FromForm] string talents)
         {
             try
             {
+                Console.WriteLine($"User: {JsonConvert.SerializeObject(user)}, Talents: {talents}");
+
                 string pwd = user.HashPwd;
+
+                // בדיקה אם הסיסמא תקינה
                 if (!CheckIfValidatePwd(pwd))
                     return BadRequest("Password must contain upper and lower case letters, numbers, and special characters.");
+
+                // חישוב סיסמא מוצפנת
                 string hashPwd = PasswordManagerService.HashPassword(pwd);
                 user.HashPwd = hashPwd;
 
-                // profile img
+                // טיפול בתמונה של פרופיל
                 if (user.File != null)
                 {
                     if (!Directory.Exists(_directory))
@@ -93,21 +100,20 @@ namespace WebAPI.Controllers
                     user.Profile = user.File.FileName;
                 }
 
-                // add user
+                // הוספת משתמש
                 UserDto newUser = _userService.AddItem(user);
-                // Add talents to TalentUser table
-                if (talents != null)
+
+
+                // הוספת כישרונות למשתמש אם יש
+                if (talents != "[]")
                 {
-                    foreach (var talent in talents)
+                    List<TalentUserDto> talentList = JsonConvert.DeserializeObject<List<TalentUserDto>>(talents);
+                    foreach (TalentUserDto t in talentList)
                     {
-                        context.TalentUser.Add(new TalentUser
-                        {
-                            UserId = newUser.Id,
-                            TalentId = talent.TalentId,
-                            IsOffered = talent.IsOffered
-                        });
+                        t.UserId = newUser.Id;
                     }
-                    context.Save();
+                    Console.WriteLine(talentList[0].UserId);
+                    _talentUserService.AddTalentsForUser(talentList);
                 }
 
                 return Ok(newUser);
@@ -117,7 +123,6 @@ namespace WebAPI.Controllers
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
         }
-
 
         private bool CheckIfValidatePwd(string pwd)
         {
@@ -138,6 +143,7 @@ namespace WebAPI.Controllers
             }
             return foundChar && foundLow && foundUp && foundNum;
         }
+
 
         // PUT api/<UserController>/5
         [Authorize]
@@ -172,19 +178,10 @@ namespace WebAPI.Controllers
 
             if (talents != null)
             {
-                var existingTalents = context.TalentUser.Where(t => t.UserId == id).ToList();
-                context.TalentUser.RemoveRange(existingTalents);
-                foreach (var talent in talents)
-                {
-                    context.TalentUser.Add(new TalentUser
-                    {
-                        UserId = id,
-                        TalentId = talent.TalentId,
-                        IsOffered = talent.IsOffered
-                    });
-                }
-                context.Save();
+                _talentUserService.AddTalentsForUser(talents);
             }
+            context.Save();
+
 
             return updatedUser;
         }

@@ -6,12 +6,12 @@ using Services.Interfaces;
 
 namespace Services.Services
 {
-    public class TalentUserService : IService<TalentUserDto>
+    public class TalentUserService : ITalentUserExtensionService
     {
-        private readonly IRepository<TalentUser> _repository;
+        private readonly ITalentUserExtensionRepository _repository;
         private readonly IMapper _mapper;
 
-        public TalentUserService(IRepository<TalentUser> repository, IMapper mapper)
+        public TalentUserService(ITalentUserExtensionRepository repository, IMapper mapper)
         {
             _repository = repository;
             _mapper = mapper;
@@ -23,6 +23,21 @@ namespace Services.Services
             var addedTalentUser = _repository.AddItem(talentUser);
             return _mapper.Map<TalentUserDto>(addedTalentUser);
         }
+
+        public List<TalentUserDto> AddTalentsForUser(List<TalentUserDto> talents)
+        {
+            if (talents == null || !talents.Any())
+                throw new ArgumentException("Talent list cannot be null or empty.");
+
+            var talentEntities = _mapper.Map<List<TalentUser>>(talents);
+            int userId = talentEntities[0].UserId; // גישה בטוחה לאינדקס ראשון
+
+            _repository.AddTalentsForUser(talentEntities);
+
+            var updatedTalents = _repository.GetTalentsByUserId(userId);
+            return _mapper.Map<List<TalentUserDto>>(updatedTalents);
+        }
+
 
         public void Delete(int id)
         {
@@ -39,6 +54,12 @@ namespace Services.Services
         {
             var talentUsers = _repository.GetAll();
             return _mapper.Map<List<TalentUserDto>>(talentUsers);
+        }
+
+        public List<TalentUserDto> GetTalentsByUserId(int userId)
+        {
+            var talents = _repository.GetTalentsByUserId(userId);
+            return _mapper.Map<List<TalentUserDto>>(talents);
         }
 
         public TalentUserDto Update(int id, TalentUserDto entity)

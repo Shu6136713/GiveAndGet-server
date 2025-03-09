@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace Repositories.Repositories
 {
-    public class TalentUserRepository : IRepository<TalentUser>, ITalentUserRepository
+    public class TalentUserRepository : IRepository<TalentUser>, ITalentUserExtensionRepository
     {
         private readonly IContext _context;
 
@@ -16,22 +16,17 @@ namespace Repositories.Repositories
             _context = context;
         }
 
-        public void AddTalentsForUser(int userId, List<TalentUser> talents)
+        public List<TalentUser> AddTalentsForUser(List<TalentUser> talents)
         {
-            var existingTalents = _context.TalentUser.Where(t => t.UserId == userId).ToList();
-            _context.TalentUser.RemoveRange(existingTalents);
+            if (talents == null || !talents.Any())
+                throw new ArgumentException("Talent list cannot be null or empty.");
 
-            foreach (var talent in talents)
-            {
-                _context.TalentUser.Add(new TalentUser
-                {
-                    UserId = userId,
-                    TalentId = talent.TalentId,
-                    IsOffered = talent.IsOffered
-                });
-            }
+            _context.TalentUser.AddRange(talents);
             _context.Save();
+
+            return GetTalentsByUserId(talents.First().UserId);
         }
+
 
         public TalentUser AddItem(TalentUser item)
         {
