@@ -25,6 +25,7 @@ namespace Repositories.Interfaces
     {
         List<TalentUser> AddTalentsForUser(List<TalentUser> talents);
         List<TalentUser> GetTalentsByUserId(int userId); // פונקציה להוספת כישרונות לפי מזהה משתמש
+        public void Delete(int userId, int talentId);
 
     }
 }

@@ -45,6 +45,18 @@ namespace Repositories.Repositories
             }
         }
 
+        public void Delete(int userId, int talentId)
+        {
+            var talentUser = _context.TalentUser
+                .FirstOrDefault(tu => tu.UserId == userId && tu.TalentId == talentId);
+
+            if (talentUser != null)
+            {
+                _context.TalentUser.Remove(talentUser);
+                _context.Save();
+            }
+        }
+
         public TalentUser Get(int id)
         {
             return _context.TalentUser.Find(id);

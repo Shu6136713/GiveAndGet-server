@@ -59,7 +59,7 @@ namespace Repositories.Repositories
             existingUser.Gender = updatedUser.Gender;
             existingUser.Desc = updatedUser.Desc;
             existingUser.IsActive = updatedUser.IsActive;
-            if (!string.IsNullOrEmpty(updatedUser.ProfileImage))
+            if (!string.IsNullOrEmpty(updatedUser.ProfileImage)&&updatedUser.ProfileImage!="default_profile_image.png")
             {
                 existingUser.ProfileImage = updatedUser.ProfileImage;
             }

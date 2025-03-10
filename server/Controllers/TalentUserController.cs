@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Services.Dtos;
 using Services.Interfaces;
 
@@ -15,7 +16,7 @@ namespace YourNamespace.Controllers
             _talentUserService = talentUserService;
         }
 
-        
+        [Authorize]
         [HttpPost("addTalents")]
         public ActionResult<List<TalentUserDto>> AddTalentsForUser([FromBody] List<TalentUserDto> talents)
         {
@@ -26,7 +27,7 @@ namespace YourNamespace.Controllers
             return Ok(updatedTalents);
         }
 
-       
+        [Authorize]
         [HttpGet("getTalents/{userId}")]
         public ActionResult<List<TalentUserDto>> GetTalentsByUserId(int userId)
         {
@@ -37,6 +38,7 @@ namespace YourNamespace.Controllers
             return Ok(talents);
         }
 
+        [Authorize]
         [HttpPost("addTalent")]
         public ActionResult<TalentUserDto> AddTalent([FromBody] TalentUserDto talent)
         {
@@ -47,6 +49,7 @@ namespace YourNamespace.Controllers
             return Ok(addedTalent);
         }
 
+        [Authorize]
         [HttpDelete("delete/{id}")]
         public IActionResult DeleteTalent(int id)
         {
@@ -54,6 +57,7 @@ namespace YourNamespace.Controllers
             return NoContent();
         }
 
+        [Authorize]
         [HttpPut("update/{id}")]
         public ActionResult<TalentUserDto> UpdateTalent(int id, [FromBody] TalentUserDto talent)
         {
