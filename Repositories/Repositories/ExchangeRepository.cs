@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Repositories.Repositories
 {
-    public class ExchangeRepository : IRepository<Exchange>
+    public class ExchangeRepository : IExchangeExtensionRepository
     {
         private readonly IContext context;
         public ExchangeRepository(IContext context)

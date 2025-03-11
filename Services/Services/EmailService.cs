@@ -30,7 +30,7 @@ namespace Services.Services
 
                 // Create a MimeMessage to construct the email
                 var emailMessage = new MimeMessage();
-                emailMessage.From.Add(new MailboxAddress("Sender", source)); // Sender email
+                emailMessage.From.Add(new MailboxAddress("give & get", source)); // Sender email
                 emailMessage.To.Add(new MailboxAddress("", dest)); // Recipient email
                 emailMessage.Subject = subject; // Set the subject of the email
                 emailMessage.Body = new TextPart("plain") { Text = body }; // Set the email body

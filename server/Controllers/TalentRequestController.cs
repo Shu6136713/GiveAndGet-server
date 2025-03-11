@@ -76,7 +76,7 @@ namespace WebAPI.Controllers
             {
                 try
                 {
-                    _emailService.SendEmail(subject, body, admin.Email); // Passing isHtml parameter
+                    _emailService.SendEmail(subject, body, admin.Email); 
                 }
                 catch (Exception ex)
                 {

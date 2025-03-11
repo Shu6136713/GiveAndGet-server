@@ -28,4 +28,9 @@ namespace Services.Interfaces
         List<TalentUserDto> AddTalentsForUser(List<TalentUserDto> talents);
         List<TalentUserDto> GetTalentsByUserId(int userId);
     }
+
+    public interface IExchangeExtensionService : IService<ExchangeDto>
+    {
+        List<ExchangeDto> GetByUserId(int userId);
+    }
 }

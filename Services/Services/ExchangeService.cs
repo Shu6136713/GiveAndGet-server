@@ -9,17 +9,25 @@ using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
+using StatusExchange = Services.Dtos.StatusExchange;
 
 namespace Services.Services
 {
-    public class ExchangeService : IService<ExchangeDto>
+    public class ExchangeService : IExchangeExtensionService
     {
-        private readonly IRepository<Exchange> _repository;
+        private readonly IExchangeExtensionRepository _repository;
+        private readonly IRepository<User> _userRepo;
+        private readonly ITalentUserExtensionRepository _talentUserRepo;
         private readonly IMapper _mapper;
 
-        public ExchangeService(IRepository<Exchange> repository, IMapper mapper)
+        public ExchangeService(IExchangeExtensionRepository repository, 
+                                IRepository<User> userRep,  
+                                    ITalentUserExtensionRepository talentUserRepo,
+                                IMapper mapper)
         {
             this._repository = repository;
+            this._userRepo = userRep;
+            this._talentUserRepo = talentUserRepo;
             this._mapper = mapper;
         }
 
@@ -37,6 +45,11 @@ namespace Services.Services
         {
             return _mapper.Map<ExchangeDto>(_repository.Get(id));
         }
+        public List<ExchangeDto> GetByUserId(int userId)
+        {
+            SearchExhcahngesForUser(userId);
+            return _mapper.Map<List<ExchangeDto>>(_repository.GetByUserId(userId));
+        }
 
         public List<ExchangeDto> GetAll()
         {
@@ -48,9 +61,58 @@ namespace Services.Services
             return _mapper.Map<ExchangeDto>(_repository.Update(id, _mapper.Map<Exchange>(item)));
         }
 
-        public List<ExchangeDto> SearchExhcahngesForUser(/*SerchDto searchDto,*/ int userId)
+        private void SearchExhcahngesForUser(int userId)
         {
-            return null;
+            var exchanges = _repository.GetByUserId(userId);
+            
+            var user = _userRepo.Get(userId);
+            var userTalents = _talentUserRepo.GetTalentsByUserId(userId);
+
+            var offeredTalents = userTalents.Where(t => t.IsOffered).ToList();
+            var requestedTalents = userTalents.Where(t => !t.IsOffered).ToList();
+
+            var newExchanges = new List<Exchange>();
+
+            foreach (var offered in offeredTalents)
+            {
+                var potentialPartners = _talentUserRepo.GetAll()
+                    .Where(t => t.TalentId == offered.TalentId && !t.IsOffered && t.UserId != userId)
+                    .ToList();
+
+                foreach (var partner in potentialPartners)
+                {
+                    var matchingTalent = _talentUserRepo.GetAll()
+                        .FirstOrDefault(t => t.UserId == userId && t.TalentId == partner.TalentId && t.IsOffered);
+
+                    if (matchingTalent != null)
+                    {
+                        bool exists = exchanges.Any(e =>
+                            (e.User1Id == userId && e.User2Id == partner.UserId) ||
+                            (e.User1Id == partner.UserId && e.User2Id == userId));
+
+                        if (!exists)
+                        {
+                            newExchanges.Add(new Exchange
+                            {
+                                User1Id = userId,
+                                User2Id = partner.UserId,
+                                Talent1Offered = offered.TalentId,
+                                Talent2Offered = partner.TalentId,
+                                Status = (Repositories.Entity.StatusExchange?)StatusExchange.NEW,
+                                DateCreated = DateTime.Now
+                            });
+                        }
+                    }
+                }
+                foreach (var ex in newExchanges)
+                {
+                    _repository.AddItem(ex);
+                }
+            }
+
         }
+
+        
     }
 }
+

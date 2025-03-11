@@ -11,7 +11,7 @@ namespace Services.Dtos
     public class TalentRequestDto
     {
         public int Id { get; set; }
-        public int UserId { get; set; }
+        public int UserId { get; set; } = 0;
         public string TalentName { get; set; }
         public int ParentCategory { get; set; }
         public DateTime? RequestDate { get; set; } = DateTime.Now;

@@ -10,7 +10,7 @@ namespace Repositories.Entity
     public  class TalentRequest
     {
         public int Id { get; set; }
-        public int UserId { get; set; }
+        public int UserId { get; set; } = 0;
         [ForeignKey("UserId")]
         public virtual User? User { get; set; }
 

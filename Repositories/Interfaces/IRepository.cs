@@ -27,4 +27,9 @@ namespace Repositories.Interfaces
         List<TalentUser> GetTalentsByUserId(int userId); // פונקציה להוספת כישרונות לפי מזהה משתמש
 
     }
-}
+
+    public interface IExchangeExtensionRepository: IRepository<Exchange>
+    {
+        List<Exchange> GetByUserId(int userId);
+    }
+} 
