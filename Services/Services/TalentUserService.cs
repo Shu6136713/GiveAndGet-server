@@ -44,6 +44,11 @@ namespace Services.Services
             _repository.Delete(id);
         }
 
+        public void Delete(int userId, int talentId)
+        {
+            _repository.Delete(userId, talentId);
+        }
+
         public TalentUserDto Get(int id)
         {
             var talentUser = _repository.Get(id);

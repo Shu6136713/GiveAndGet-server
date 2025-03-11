@@ -48,7 +48,7 @@ namespace Repositories.Repositories
             if (existingUser == null)
                 throw new KeyNotFoundException($"User with ID {id} not found.");
             
-
+            
             existingUser.HashPwd = updatedUser.HashPwd;
             existingUser.PhoneNumber = updatedUser.PhoneNumber;
             existingUser.Email = updatedUser.Email;
@@ -59,7 +59,10 @@ namespace Repositories.Repositories
             existingUser.Gender = updatedUser.Gender;
             existingUser.Desc = updatedUser.Desc;
             existingUser.IsActive = updatedUser.IsActive;
-            existingUser.ProfileImage = updatedUser.ProfileImage;
+            if (!string.IsNullOrEmpty(updatedUser.ProfileImage)&&updatedUser.ProfileImage!="default_profile_image.png")
+            {
+                existingUser.ProfileImage = updatedUser.ProfileImage;
+            }
 
             _context.Save();
             return existingUser;

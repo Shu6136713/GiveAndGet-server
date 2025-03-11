@@ -148,7 +148,7 @@ namespace WebAPI.Controllers
         // PUT api/<UserController>/5
         [Authorize]
         [HttpPut("{id}")]
-        public UserDto Put(int id, [FromForm] UserDto updateUser, [FromForm] List<TalentUserDto> talents)
+        public UserDto Put(int id, [FromForm] UserDto updateUser, [FromForm] string talents)
         {
             var userIdFromToken = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
@@ -176,11 +176,31 @@ namespace WebAPI.Controllers
             }
             UserDto updatedUser = _userService.Update(id, updateUser);
 
-            if (talents != null)
+            if (!string.IsNullOrEmpty(talents) && talents != "[]" && talents!=null)
             {
-                _talentUserService.AddTalentsForUser(talents);
+                List<dynamic> talentList = JsonConvert.DeserializeObject<List<dynamic>>(talents);
+                var talentsToRemove = talentList.Where(t => (bool)(t.Remove ?? false)).ToList();
+                foreach (var t in talentsToRemove)
+                {
+                    TalentUserDto talent = _talentUserService.GetTalentsByUserId(updatedUser.Id)
+                         .Where(x => x.TalentId == (int)t.TalentId)
+                         .FirstOrDefault();
+                    if (talent != null)
+                    {
+                        _talentUserService.Delete(talent.UserId,talent.TalentId);
+                    }
+                }
+
+                // Convert talents that are not marked for removal to TalentUserDto
+                List<TalentUserDto> talentsToAdd = talentList
+                    .Where(t => !(bool)(t.Remove ?? false))
+                    .Select(t => new TalentUserDto
+                    {
+                        UserId = updatedUser.Id
+                    })
+                    .ToList();
+                _talentUserService.AddTalentsForUser(talentsToAdd);
             }
-            context.Save();
 
 
             return updatedUser;

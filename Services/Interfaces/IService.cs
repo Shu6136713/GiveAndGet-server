@@ -27,6 +27,8 @@ namespace Services.Interfaces
     {
         List<TalentUserDto> AddTalentsForUser(List<TalentUserDto> talents);
         List<TalentUserDto> GetTalentsByUserId(int userId);
+        public void Delete(int userId, int talentId);
+
     }
 
     public interface IExchangeExtensionService : IService<ExchangeDto>
