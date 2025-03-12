@@ -47,7 +47,7 @@ namespace Services.Services
         }
         public List<ExchangeDto> GetByUserId(int userId)
         {
-            SearchExhcahngesForUser(userId);
+            //SearchExhcahngesForUser(userId);
             return _mapper.Map<List<ExchangeDto>>(_repository.GetByUserId(userId));
         }
 
@@ -61,7 +61,7 @@ namespace Services.Services
             return _mapper.Map<ExchangeDto>(_repository.Update(id, _mapper.Map<Exchange>(item)));
         }
 
-        private void SearchExhcahngesForUser(int userId)
+        public void SearchExhcahngesForUser(int userId)
         {
             var exchanges = _repository.GetByUserId(userId);
             
@@ -110,9 +110,37 @@ namespace Services.Services
                 }
             }
 
+
         }
 
-        
+        public void UpdateUserExchanges(int userId, List<int> removedTalentIds)
+        {
+            // שליפת כל העסקאות הקיימות של המשתמש
+            var userExchanges = _repository.GetByUserId(userId);
+
+            // מחיקת עסקאות שעדיין לא התחילו
+            var newExchanges = userExchanges.Where(e => e.Status.Equals(StatusExchange.NEW)).ToList();
+            foreach (var exchange in newExchanges)
+            {
+                _repository.Delete(exchange.Id);
+            }
+
+            // מחיקת עסקאות שממתינות לתגובה אם מבוססות על כישרון שהוסר
+            var pendingExchanges = userExchanges.Where(e => e.Status.Equals(StatusExchange.WAITINT)).ToList();
+            foreach (var exchange in pendingExchanges)
+            {
+                if (removedTalentIds.Contains(exchange.Talent1Offered) || removedTalentIds.Contains(exchange.Talent2Offered))
+                {
+                    _repository.Delete(exchange.Id);
+                }
+            }
+            // יצירת עסקאות חדשות
+            SearchExhcahngesForUser(userId);
+        }
+
+
+
+
     }
 }
 

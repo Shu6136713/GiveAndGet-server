@@ -19,13 +19,19 @@ namespace WebAPI.Controllers
     {
         private readonly IService<UserDto> _userService;
         private readonly ITalentUserExtensionService _talentUserService;
+        private readonly IExchangeExtensionService _exchangeService;
         private readonly IContext context;
         public static string _directory = Path.Combine(Environment.CurrentDirectory, "Images");
+        
 
-        public UserController(IService<UserDto> userService, ITalentUserExtensionService talentUserService, IContext context)
+        public UserController(IService<UserDto> userService, 
+            ITalentUserExtensionService talentUserService,
+            IExchangeExtensionService exchangeService,
+            IContext context)
         {
             _userService = userService;
             _talentUserService = talentUserService;
+            _exchangeService = exchangeService;
             this.context = context;
         }
 
@@ -152,11 +158,13 @@ namespace WebAPI.Controllers
         {
             var userIdFromToken = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
+            // Check if the user is trying to update their own data
             if (userIdFromToken != id.ToString())
             {
                 throw new Exception("You cannot update user who is not yourself.");
             }
 
+            // Validate and hash password if it's being updated
             if (!string.IsNullOrEmpty(updateUser.HashPwd))
             {
                 if (!CheckIfValidatePwd(updateUser.HashPwd))
@@ -165,6 +173,7 @@ namespace WebAPI.Controllers
                 updateUser.HashPwd = hashPwd;
             }
 
+            // Save the new profile picture if uploaded
             if (updateUser.File != null)
             {
                 var filePath = Path.Combine(_directory, updateUser.File.FileName);
@@ -174,37 +183,52 @@ namespace WebAPI.Controllers
                 }
                 updateUser.Profile = updateUser.File.FileName;
             }
+
+            // Retrieve the user's old talents before update
+            var oldTalents = _talentUserService.GetTalentsByUserId(id).Select(t => t.TalentId).ToList();
+
+            // Update the user information
             UserDto updatedUser = _userService.Update(id, updateUser);
 
-            if (!string.IsNullOrEmpty(talents) && talents != "[]" && talents!=null)
+            List<int> removedTalentIds = new List<int>();
+
+            // If talents are provided, process them
+            if (!string.IsNullOrEmpty(talents) && talents != "[]" && talents != null)
             {
                 List<dynamic> talentList = JsonConvert.DeserializeObject<List<dynamic>>(talents);
+
+                // Remove the talents marked for removal
                 var talentsToRemove = talentList.Where(t => (bool)(t.Remove ?? false)).ToList();
                 foreach (var t in talentsToRemove)
                 {
                     TalentUserDto talent = _talentUserService.GetTalentsByUserId(updatedUser.Id)
-                         .Where(x => x.TalentId == (int)t.TalentId)
-                         .FirstOrDefault();
+                        .Where(x => x.TalentId == (int)t.TalentId)
+                        .FirstOrDefault();
                     if (talent != null)
                     {
-                        _talentUserService.Delete(talent.UserId,talent.TalentId);
+                        _talentUserService.Delete(talent.UserId, talent.TalentId);
+                        removedTalentIds.Add((int)t.TalentId);
                     }
                 }
 
-                // Convert talents that are not marked for removal to TalentUserDto
+                // Add the new talents that are not marked for removal
                 List<TalentUserDto> talentsToAdd = talentList
                     .Where(t => !(bool)(t.Remove ?? false))
                     .Select(t => new TalentUserDto
                     {
-                        UserId = updatedUser.Id
+                        UserId = updatedUser.Id,
+                        TalentId = (int)t.TalentId
                     })
                     .ToList();
                 _talentUserService.AddTalentsForUser(talentsToAdd);
             }
 
+            // Call the function to update the user's exchanges
+            _exchangeService.UpdateUserExchanges(id, removedTalentIds);
 
             return updatedUser;
         }
+
 
         // DELETE api/<UserController>/5
         [HttpDelete("{id}")]

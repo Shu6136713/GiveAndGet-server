@@ -26,6 +26,7 @@ namespace Services.Interfaces
     public interface ITalentUserExtensionService : IService<TalentUserDto>
     {
         List<TalentUserDto> AddTalentsForUser(List<TalentUserDto> talents);
+        void DeleteTalentForUser(List<TalentUserDto> talents);
         List<TalentUserDto> GetTalentsByUserId(int userId);
         public void Delete(int userId, int talentId);
 

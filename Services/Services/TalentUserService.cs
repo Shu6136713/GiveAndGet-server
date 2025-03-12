@@ -30,7 +30,7 @@ namespace Services.Services
                 throw new ArgumentException("Talent list cannot be null or empty.");
 
             var talentEntities = _mapper.Map<List<TalentUser>>(talents);
-            int userId = talentEntities[0].UserId; // גישה בטוחה לאינדקס ראשון
+            int userId = talentEntities.First().UserId; // גישה בטוחה לאינדקס ראשון
 
             _repository.AddTalentsForUser(talentEntities);
 
@@ -47,6 +47,18 @@ namespace Services.Services
         public void Delete(int userId, int talentId)
         {
             _repository.Delete(userId, talentId);
+        }
+
+        public void DeleteTalentForUser(List<TalentUserDto> talents)
+        {
+            if (talents == null || !talents.Any())
+                throw new ArgumentException("Talent list cannot be null or empty.");
+
+            var talentEntities = _mapper.Map<List<TalentUser>>(talents);
+            int userId = talentEntities.First().UserId; // גישה בטוחה לאינדקס ראשון
+
+            _repository.DeleteTalentForUser(talentEntities);
+
         }
 
         public TalentUserDto Get(int id)

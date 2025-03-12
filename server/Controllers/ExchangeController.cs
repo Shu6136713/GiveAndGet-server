@@ -13,33 +13,34 @@ namespace WebAPI.Controllers
     [ApiController]
     public class ExchangeController : ControllerBase
     {
-        private readonly IService<ExchangeDto> _exchangeService;
+        private readonly IExchangeExtensionService _exchangeService;
 
-        public ExchangeController(IService<ExchangeDto> exchangeService)
+        public ExchangeController(IExchangeExtensionService exchangeService)
         {
             _exchangeService = exchangeService;
         }
 
         // GET: api/<ExchangeController>
-        [HttpGet]
+        //[HttpGet]
         //public List<ExchangeDto> Get()
         //{
         //    return _exchangeService.GetAll();
         //}
 
         // GET api/<ExchangeController>/5
-        [Authorize]
+         [Authorize]
         [HttpGet("{id}")]
         public ExchangeDto Get(int id)
         { 
             return _exchangeService.Get(id);
         }
 
-        [Authorize]
+        //[Authorize]
         [HttpGet("searchByUser")]
         public List<ExchangeDto> SearchDealsByUser(/*[FromQuery] DealSearchDto searchDto*/ [FromQuery] int userId)
         {
-            return _exchangeService.GetAll().Where(e => e.User1Id == userId || e.User2Id == userId).ToList();
+            return _exchangeService.GetByUserId(userId);
+            //return _exchangeService.GetAll().Where(e => e.User1Id == userId || e.User2Id == userId).ToList();
             //try
             //{
             //    // מקבל את פרטי החיפוש של המשתמש

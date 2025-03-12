@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace Repositories.Repositories
 {
-    public class TalentUserRepository : IRepository<TalentUser>, ITalentUserExtensionRepository
+    public class TalentUserRepository :  ITalentUserExtensionRepository
     {
         private readonly IContext _context;
 
@@ -82,6 +82,16 @@ namespace Repositories.Repositories
         public List<TalentUser> GetTalentsByUserId(int userId)
         {
             return _context.TalentUser.Where(t => t.UserId == userId).ToList();
+        }
+
+        public void DeleteTalentForUser(List<TalentUser> talents)
+        {
+            if (talents == null || !talents.Any())
+                throw new ArgumentException("Talent list cannot be null or empty.");
+
+            _context.TalentUser.RemoveRange(talents);
+            _context.Save();
+
         }
     }
 }

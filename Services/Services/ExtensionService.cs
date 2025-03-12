@@ -23,6 +23,7 @@ namespace Services.Services
 
             services.AddScoped<ITalentExtensionService, TalentService>();
             services.AddScoped<ITalentUserExtensionService, TalentUserService>();
+            services.AddScoped<IExchangeExtensionService, ExchangeService>();
             services.AddScoped<EmailService>();
             services.AddAutoMapper(typeof(MyMapper));
 

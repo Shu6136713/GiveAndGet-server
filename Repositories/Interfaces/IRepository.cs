@@ -24,11 +24,13 @@ namespace Repositories.Interfaces
     public interface ITalentUserExtensionRepository : IRepository<TalentUser>
     {
         List<TalentUser> AddTalentsForUser(List<TalentUser> talents);
+        void DeleteTalentForUser(List<TalentUser> talents);
         List<TalentUser> GetTalentsByUserId(int userId); // פונקציה להוספת כישרונות לפי מזהה משתמש
         public void Delete(int userId, int talentId);
 
     }
 
+    public interface IExchangeExtensionRepository: IRepository<Exchange>
     public interface IExchangeExtensionRepository: IRepository<Exchange>
     {
         List<Exchange> GetByUserId(int userId);
