@@ -57,6 +57,11 @@ namespace Mock
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.HashPwd)
                 .IsUnique();
+
+            modelBuilder.Entity<Talent>()
+                .HasIndex(t => t.TalentName)
+                .IsUnique();
+
             modelBuilder.Entity<TalentUser>()
            .HasKey(tu => new { tu.UserId, tu.TalentId });
         }

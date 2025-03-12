@@ -31,8 +31,8 @@ namespace Repositories.Interfaces
     }
 
     public interface IExchangeExtensionRepository: IRepository<Exchange>
-    public interface IExchangeExtensionRepository: IRepository<Exchange>
     {
         List<Exchange> GetByUserId(int userId);
+
     }
 } 

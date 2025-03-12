@@ -9,7 +9,7 @@ namespace Repositories.Entity
 {
     public enum StatusExchange{ 
         NEW,
-        WAITINT,
+        WAITING,
         PROCCESSING,
         DONE
     }

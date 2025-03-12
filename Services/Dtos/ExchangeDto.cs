@@ -11,7 +11,7 @@ namespace Services.Dtos
     public enum StatusExchange
     {
         NEW,
-        WAITINT,
+        WAITING,
         PROCCESSING,
         DONE
     }

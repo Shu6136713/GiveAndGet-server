@@ -118,8 +118,9 @@ namespace WebAPI.Controllers
                     {
                         t.UserId = newUser.Id;
                     }
-                    Console.WriteLine(talentList[0].UserId);
+                    Console.WriteLine(talentList.First().UserId);
                     _talentUserService.AddTalentsForUser(talentList);
+                    _exchangeService.SearchExhcahngesForUser(newUser.Id);
                 }
 
                 return Ok(newUser);
@@ -152,28 +153,28 @@ namespace WebAPI.Controllers
 
 
         // PUT api/<UserController>/5
-        [Authorize]
+        //[Authorize]
         [HttpPut("{id}")]
         public UserDto Put(int id, [FromForm] UserDto updateUser, [FromForm] string talents)
         {
-            var userIdFromToken = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            Console.WriteLine(talents);
+            //// מקבלים את ה-ID של המשתמש מהטוקן (אימות שהמשתמש מעדכן את עצמו)
+            //var userIdFromToken = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            //if (userIdFromToken != id.ToString())
+            //{
+            //    throw new Exception("You cannot update user who is not yourself.");
+            //}
 
-            // Check if the user is trying to update their own data
-            if (userIdFromToken != id.ToString())
-            {
-                throw new Exception("You cannot update user who is not yourself.");
-            }
-
-            // Validate and hash password if it's being updated
+            // אם המשתמש מעדכן סיסמה, מבצעים בדיקות ואימות
             if (!string.IsNullOrEmpty(updateUser.HashPwd))
             {
                 if (!CheckIfValidatePwd(updateUser.HashPwd))
                     throw new Exception("Password must contain upper and lower case letters, numbers, and special characters.");
-                string hashPwd = PasswordManagerService.HashPassword(updateUser.HashPwd);
-                updateUser.HashPwd = hashPwd;
+
+                updateUser.HashPwd = PasswordManagerService.HashPassword(updateUser.HashPwd);
             }
 
-            // Save the new profile picture if uploaded
+            // אם המשתמש מעלה תמונת פרופיל חדשה, שומרים אותה בשרת
             if (updateUser.File != null)
             {
                 var filePath = Path.Combine(_directory, updateUser.File.FileName);
@@ -184,50 +185,47 @@ namespace WebAPI.Controllers
                 updateUser.Profile = updateUser.File.FileName;
             }
 
-            // Retrieve the user's old talents before update
-            var oldTalents = _talentUserService.GetTalentsByUserId(id).Select(t => t.TalentId).ToList();
+            // שליפת רשימת הכישרונות הנוכחית של המשתמש מהמערכת
+            var currentTalents = _talentUserService.GetTalentsByUserId(id).Select(t => t.TalentId).ToList();
 
-            // Update the user information
-            UserDto updatedUser = _userService.Update(id, updateUser);
+            // המרת המחרוזת JSON שהתקבלה לרשימת מזהי כישרונות
+            List<TalentUserDto> talentUserList_new = !string.IsNullOrEmpty(talents) ?
+                JsonConvert.DeserializeObject<List<TalentUserDto>>(talents) : new List<TalentUserDto>();
+            var newTalents = talentUserList_new.Select(t => t.TalentId).Distinct().ToList();
 
-            List<int> removedTalentIds = new List<int>();
+            // יצירת רשימת כישרונות שנמחקו (כישרונות שהיו למשתמש בעבר אך לא נמצאים יותר ברשימה החדשה)
+            var removedTalentIds = currentTalents.Except(newTalents).ToList();
 
-            // If talents are provided, process them
-            if (!string.IsNullOrEmpty(talents) && talents != "[]" && talents != null)
+            // יצירת רשימת כישרונות שנוספו (כישרונות שנמצאים ברשימה החדשה אך לא היו בעבר)
+            var addedTalentIds = newTalents.Except(currentTalents).ToList();
+
+            // מחיקת כל הכישרונות שהוסרו מהרשימה
+            foreach (var talentId in removedTalentIds)
             {
-                List<dynamic> talentList = JsonConvert.DeserializeObject<List<dynamic>>(talents);
-
-                // Remove the talents marked for removal
-                var talentsToRemove = talentList.Where(t => (bool)(t.Remove ?? false)).ToList();
-                foreach (var t in talentsToRemove)
-                {
-                    TalentUserDto talent = _talentUserService.GetTalentsByUserId(updatedUser.Id)
-                        .Where(x => x.TalentId == (int)t.TalentId)
-                        .FirstOrDefault();
-                    if (talent != null)
-                    {
-                        _talentUserService.Delete(talent.UserId, talent.TalentId);
-                        removedTalentIds.Add((int)t.TalentId);
-                    }
-                }
-
-                // Add the new talents that are not marked for removal
-                List<TalentUserDto> talentsToAdd = talentList
-                    .Where(t => !(bool)(t.Remove ?? false))
-                    .Select(t => new TalentUserDto
-                    {
-                        UserId = updatedUser.Id,
-                        TalentId = (int)t.TalentId
-                    })
-                    .ToList();
-                _talentUserService.AddTalentsForUser(talentsToAdd);
+                _talentUserService.Delete(id, talentId);
             }
 
-            // Call the function to update the user's exchanges
-            _exchangeService.UpdateUserExchanges(id, removedTalentIds);
+            // הוספת כישרונות חדשים (אם יש כאלו)
+            if (addedTalentIds.Any())
+            {
+                var addedTalents = talentUserList_new
+                            .Where(t => addedTalentIds.Contains(t.TalentId)) // מסננים רק את הכישרונות החדשים
+                            .Select(t => new TalentUserDto { UserId = id, TalentId = t.TalentId, IsOffered = t.IsOffered }) // שומרים את ה- IsOffered
+                            .ToList();
+
+                _talentUserService.AddTalentsForUser(addedTalents); 
+            }
+
+            // עדכון פרטי המשתמש במערכת
+            UserDto updatedUser = _userService.Update(id, updateUser);
+
+            // עדכון עסקאות בהתאם לכישרונות שנוספו ונמחקו
+            _exchangeService.UpdateUserExchanges(id, removedTalentIds, addedTalentIds);
 
             return updatedUser;
         }
+
+
 
 
         // DELETE api/<UserController>/5

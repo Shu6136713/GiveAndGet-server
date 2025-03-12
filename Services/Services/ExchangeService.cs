@@ -66,6 +66,7 @@ namespace Services.Services
             var exchanges = _repository.GetByUserId(userId);
             
             var user = _userRepo.Get(userId);
+            
             var userTalents = _talentUserRepo.GetTalentsByUserId(userId);
 
             var offeredTalents = userTalents.Where(t => t.IsOffered).ToList();
@@ -113,30 +114,31 @@ namespace Services.Services
 
         }
 
-        public void UpdateUserExchanges(int userId, List<int> removedTalentIds)
+        public void UpdateUserExchanges(int userId, List<int> removedTalentIds, List<int> addedTalentIds)
         {
-            // שליפת כל העסקאות הקיימות של המשתמש
+            // שליפת כל העסקאות של המשתמש
             var userExchanges = _repository.GetByUserId(userId);
 
-            // מחיקת עסקאות שעדיין לא התחילו
-            var newExchanges = userExchanges.Where(e => e.Status.Equals(StatusExchange.NEW)).ToList();
-            foreach (var exchange in newExchanges)
+            // איתור עסקאות חדשות או עסקאות שממתינות לתגובה שכוללות כישרונות שהוסרו
+            var exchangesToDelete = userExchanges
+                .Where(e => e.Status.Equals(StatusExchange.NEW) || e.Status.Equals(StatusExchange.WAITING)) // מסננים רק עסקאות חדשות או ממתינות
+                .Where(e => removedTalentIds.Contains(e.Talent1Offered) || removedTalentIds.Contains(e.Talent2Offered)) // בודקים אם הכישרון בעסקה נמחק
+                .ToList();
+
+            // מחיקת העסקאות שמצאנו
+            foreach (var exchange in exchangesToDelete)
             {
                 _repository.Delete(exchange.Id);
             }
 
-            // מחיקת עסקאות שממתינות לתגובה אם מבוססות על כישרון שהוסר
-            var pendingExchanges = userExchanges.Where(e => e.Status.Equals(StatusExchange.WAITINT)).ToList();
-            foreach (var exchange in pendingExchanges)
+            // אם נוספו כישרונות חדשים, ניצור עסקאות חדשות בהתאם
+            if (addedTalentIds.Any())
             {
-                if (removedTalentIds.Contains(exchange.Talent1Offered) || removedTalentIds.Contains(exchange.Talent2Offered))
-                {
-                    _repository.Delete(exchange.Id);
-                }
+                SearchExhcahngesForUser(userId);
             }
-            // יצירת עסקאות חדשות
-            SearchExhcahngesForUser(userId);
         }
+
+
 
 
 

@@ -35,5 +35,7 @@ namespace Services.Interfaces
     public interface IExchangeExtensionService : IService<ExchangeDto>
     {
         List<ExchangeDto> GetByUserId(int userId);
+        void SearchExhcahngesForUser(int userId);
+        void UpdateUserExchanges(int userId, List<int> removedTalentIds, List<int> addedTalentIds);
     }
 }

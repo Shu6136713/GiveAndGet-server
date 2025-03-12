@@ -18,7 +18,7 @@ namespace Repositories.Entity
         public string PhoneNumber { get; set; }
         public string Email { get; set; }
         public  string UserName { get; set; }
-        public int Score { get; set; } = 0;
+        public int Score { get; set; } = 50;
         //public ICollection<TalentUser>? Talents { get; set; }
         public int Age { get; set; }
         public Gender Gender { get; set; }

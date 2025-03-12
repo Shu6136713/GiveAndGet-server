@@ -20,7 +20,7 @@ namespace Services.Dtos
         public string PhoneNumber { get; set; }
         public string Email { get; set; }
         public string UserName { get; set; }
-        public int Score { get; set; } = 0;
+        public int Score { get; set; } = 50;
         //public ICollection<TalentUserDto>? Talents { get; set; }
         //public ICollection<Talent>? TalensOffered { get; set; }
         //public ICollection<Talent>? TalentsWanted { get; set; }
