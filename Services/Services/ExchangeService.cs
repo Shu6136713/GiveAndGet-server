@@ -10,6 +10,8 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using StatusExchange = Services.Dtos.StatusExchange;
+using StatusExchangeRep = Repositories.Entity.StatusExchange;
+
 
 namespace Services.Services
 {
@@ -61,33 +63,63 @@ namespace Services.Services
             return _mapper.Map<ExchangeDto>(_repository.Update(id, _mapper.Map<Exchange>(item)));
         }
 
-        public void SearchExhcahngesForUser(int userId)
+        public void SearchExchangesForUser(int userId)
         {
             var exchanges = _repository.GetByUserId(userId);
-            
             var user = _userRepo.Get(userId);
-            
             var userTalents = _talentUserRepo.GetTalentsByUserId(userId);
 
             var offeredTalents = userTalents.Where(t => t.IsOffered).ToList();
             var requestedTalents = userTalents.Where(t => !t.IsOffered).ToList();
 
-            var newExchanges = new List<Exchange>();
+            var allTalentUsers = _talentUserRepo.GetAll().ToList();
+            List<Exchange> newExchanges = new List<Exchange>();
 
-            foreach (var offered in offeredTalents)
+            ProcessTalentMatches(userId, user,userTalents,allTalentUsers,exchanges,newExchanges);
+            //ProcessTalentMatches(userId, user, offeredTalents, allTalentUsers, exchanges, newExchanges, isOffered: true);
+            //ProcessTalentMatches(userId, user, requestedTalents, allTalentUsers, exchanges, newExchanges, isOffered: false);
+
+            foreach (var exchange in newExchanges)
             {
-                var potentialPartners = _talentUserRepo.GetAll()
-                    .Where(t => t.TalentId == offered.TalentId && !t.IsOffered && t.UserId != userId)
+                _repository.AddItem(exchange);
+            }
+        }
+
+        /// <summary>
+        /// מחפש שותפים מתאימים לעסקאות תוך התחשבות בגילאים ומגדר.
+        /// </summary>
+        private void ProcessTalentMatches(int userId, User user, List<TalentUser> userTalents,
+                                  List<TalentUser> allTalentUsers, List<Exchange> existingExchanges,
+                                  List<Exchange> newExchanges)//, bool isOffered)
+        {
+            foreach (var talent in userTalents)
+            {
+                // חיפוש משתמשים שמבקשים את מה שאני מציע ולהפך
+                var potentialPartners = allTalentUsers
+                    .Where(t => t.TalentId == talent.TalentId && t.IsOffered != talent.IsOffered && t.UserId != userId)
                     .ToList();
 
                 foreach (var partner in potentialPartners)
                 {
-                    var matchingTalent = _talentUserRepo.GetAll()
-                        .FirstOrDefault(t => t.UserId == userId && t.TalentId == partner.TalentId && t.IsOffered);
+                    var partnerUser = _userRepo.Get(partner.UserId);
 
-                    if (matchingTalent != null)
+                    // מניעת עסקה בין גברים לנשים
+                    if (user.Gender != partnerUser.Gender) continue;
+
+                    // בדיקה שהגילאים תואמים
+                    if (!IsAgeMatch(user.Age, partnerUser.Age)) continue;
+
+                    // ***תיקון כאן: עכשיו מחפשים התאמה הפוכה ולא זהה!***
+                    var otherTalent = allTalentUsers.FirstOrDefault(t =>/**//**/
+                        t.UserId==partner.UserId && 
+                        (
+                            userTalents.FirstOrDefault(ut=> ut.TalentId == t.TalentId && ut.IsOffered != talent.IsOffered) != null
+                        )
+                        && t.IsOffered != talent.IsOffered); // 🔄 הפוך ממה שמחפשים בצד השני
+                    
+                    if (otherTalent != null)
                     {
-                        bool exists = exchanges.Any(e =>
+                        bool exists = existingExchanges.Any(e =>
                             (e.User1Id == userId && e.User2Id == partner.UserId) ||
                             (e.User1Id == partner.UserId && e.User2Id == userId));
 
@@ -96,23 +128,36 @@ namespace Services.Services
                             newExchanges.Add(new Exchange
                             {
                                 User1Id = userId,
-                                User2Id = partner.UserId,
-                                Talent1Offered = offered.TalentId,
-                                Talent2Offered = partner.TalentId,
-                                Status = (Repositories.Entity.StatusExchange?)StatusExchange.NEW,
+                                User2Id = partner.UserId,/***********/
+                                Talent1Offered = talent.IsOffered ? talent.TalentId : otherTalent.TalentId,
+                                Talent2Offered = talent.IsOffered ? otherTalent.TalentId : talent.TalentId,
+                                Status = StatusExchangeRep.NEW,
                                 DateCreated = DateTime.Now
                             });
                         }
                     }
                 }
-                foreach (var ex in newExchanges)
-                {
-                    _repository.AddItem(ex);
-                }
             }
-
-
         }
+
+
+        /// <summary>
+        /// קובע אם שני גילאים יכולים להיות בהתאמה עסקית.
+        /// </summary>
+        private bool IsAgeMatch(int age1, int age2)
+        {
+            int minAge = Math.Min(age1, age2);
+            int maxAge = Math.Max(age1, age2);
+
+            if (maxAge <= 5) return minAge >= 3; // פעוטות יכולים עם פעוטות  
+            if (maxAge <= 10) return minAge >= 5;
+            if (maxAge <= 15) return minAge >= 10;
+            if (maxAge <= 20) return minAge >= 15;
+            if (maxAge <= 30) return minAge >= 18;
+            if (maxAge <= 50) return minAge >= 25;
+            return minAge >= 40; // מבוגרים יכולים עם בני גילם  
+        }
+
 
         public void UpdateUserExchanges(int userId, List<int> removedTalentIds, List<int> addedTalentIds)
         {
@@ -130,12 +175,9 @@ namespace Services.Services
             {
                 _repository.Delete(exchange.Id);
             }
-
-            // אם נוספו כישרונות חדשים, ניצור עסקאות חדשות בהתאם
-            if (addedTalentIds.Any())
-            {
-                SearchExhcahngesForUser(userId);
-            }
+            
+            SearchExchangesForUser(userId);
+            
         }
 
 

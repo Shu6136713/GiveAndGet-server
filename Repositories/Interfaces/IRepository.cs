@@ -27,6 +27,7 @@ namespace Repositories.Interfaces
         void DeleteTalentForUser(List<TalentUser> talents);
         List<TalentUser> GetTalentsByUserId(int userId); // פונקציה להוספת כישרונות לפי מזהה משתמש
         public void Delete(int userId, int talentId);
+        void UpdateIsOffered(int userId, int talentId, bool isOffered);
 
     }
 

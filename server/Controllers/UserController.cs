@@ -19,6 +19,7 @@ namespace WebAPI.Controllers
     {
         private readonly IService<UserDto> _userService;
         private readonly ITalentUserExtensionService _talentUserService;
+        private readonly ITalentExtensionService _talentService;
         private readonly IExchangeExtensionService _exchangeService;
         private readonly IContext context;
         public static string _directory = Path.Combine(Environment.CurrentDirectory, "Images");
@@ -27,11 +28,13 @@ namespace WebAPI.Controllers
         public UserController(IService<UserDto> userService, 
             ITalentUserExtensionService talentUserService,
             IExchangeExtensionService exchangeService,
+            ITalentExtensionService talentExtensionService,
             IContext context)
         {
             _userService = userService;
             _talentUserService = talentUserService;
             _exchangeService = exchangeService;
+            _talentService = talentExtensionService;
             this.context = context;
         }
 
@@ -120,7 +123,7 @@ namespace WebAPI.Controllers
                     }
                     Console.WriteLine(talentList.First().UserId);
                     _talentUserService.AddTalentsForUser(talentList);
-                    _exchangeService.SearchExhcahngesForUser(newUser.Id);
+                    _exchangeService.SearchExchangesForUser(newUser.Id);
                 }
 
                 return Ok(newUser);
@@ -153,17 +156,10 @@ namespace WebAPI.Controllers
 
 
         // PUT api/<UserController>/5
-        //[Authorize]
         [HttpPut("{id}")]
         public UserDto Put(int id, [FromForm] UserDto updateUser, [FromForm] string talents)
         {
             Console.WriteLine(talents);
-            //// מקבלים את ה-ID של המשתמש מהטוקן (אימות שהמשתמש מעדכן את עצמו)
-            //var userIdFromToken = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            //if (userIdFromToken != id.ToString())
-            //{
-            //    throw new Exception("You cannot update user who is not yourself.");
-            //}
 
             // אם המשתמש מעדכן סיסמה, מבצעים בדיקות ואימות
             if (!string.IsNullOrEmpty(updateUser.HashPwd))
@@ -186,20 +182,34 @@ namespace WebAPI.Controllers
             }
 
             // שליפת רשימת הכישרונות הנוכחית של המשתמש מהמערכת
-            var currentTalents = _talentUserService.GetTalentsByUserId(id).Select(t => t.TalentId).ToList();
+            var currentTalents = _talentUserService.GetTalentsByUserId(id)
+                                  .Select(t => t.TalentId).ToList();
 
-            // המרת המחרוזת JSON שהתקבלה לרשימת מזהי כישרונות
+            // המרת המחרוזת JSON שהתקבלה לרשימת כישרונות המשתמש
             List<TalentUserDto> talentUserList_new = !string.IsNullOrEmpty(talents) ?
                 JsonConvert.DeserializeObject<List<TalentUserDto>>(talents) : new List<TalentUserDto>();
+
+            // רשימת ה- TalentId החדשה לאחר הסינון
             var newTalents = talentUserList_new.Select(t => t.TalentId).Distinct().ToList();
 
-            // יצירת רשימת כישרונות שנמחקו (כישרונות שהיו למשתמש בעבר אך לא נמצאים יותר ברשימה החדשה)
+            // זיהוי כישרונות שנמחקו (היו בעבר אך לא ברשימה החדשה)
             var removedTalentIds = currentTalents.Except(newTalents).ToList();
 
-            // יצירת רשימת כישרונות שנוספו (כישרונות שנמצאים ברשימה החדשה אך לא היו בעבר)
+            // זיהוי כישרונות חדשים (נמצאים ברשימה החדשה אך לא היו בעבר)
             var addedTalentIds = newTalents.Except(currentTalents).ToList();
 
-            // מחיקת כל הכישרונות שהוסרו מהרשימה
+            // זיהוי כישרונות שהיו קיימים אך ייתכן והסטטוס שלהם (IsOffered) השתנה
+            var existingTalents = currentTalents.Intersect(newTalents).ToList();
+            foreach (var talentId in existingTalents)
+            {
+                var newTalent = talentUserList_new.FirstOrDefault(t => t.TalentId == talentId);
+                if (newTalent != null)
+                {
+                    _talentUserService.UpdateIsOffered(id, talentId, newTalent.IsOffered);
+                }
+            }
+
+            // מחיקת הכישרונות שהוסרו מהרשימה
             foreach (var talentId in removedTalentIds)
             {
                 _talentUserService.Delete(id, talentId);
@@ -209,11 +219,11 @@ namespace WebAPI.Controllers
             if (addedTalentIds.Any())
             {
                 var addedTalents = talentUserList_new
-                            .Where(t => addedTalentIds.Contains(t.TalentId)) // מסננים רק את הכישרונות החדשים
-                            .Select(t => new TalentUserDto { UserId = id, TalentId = t.TalentId, IsOffered = t.IsOffered }) // שומרים את ה- IsOffered
-                            .ToList();
+                    .Where(t => addedTalentIds.Contains(t.TalentId)) // מסננים רק את הכישרונות החדשים
+                    .Select(t => new TalentUserDto { UserId = id, TalentId = t.TalentId, IsOffered = t.IsOffered }) // שומרים את ה- IsOffered
+                    .ToList();
 
-                _talentUserService.AddTalentsForUser(addedTalents); 
+                _talentUserService.AddTalentsForUser(addedTalents);
             }
 
             // עדכון פרטי המשתמש במערכת
@@ -224,6 +234,7 @@ namespace WebAPI.Controllers
 
             return updatedUser;
         }
+
 
 
 

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Repositories.Entity;
 using Repositories.Interfaces;
+using Repositories.Repositories;
 using Services.Dtos;
 using Services.Interfaces;
 
@@ -85,5 +86,12 @@ namespace Services.Services
             var updatedTalentUser = _repository.Update(id, talentUser);
             return _mapper.Map<TalentUserDto>(updatedTalentUser);
         }
+
+        public void UpdateIsOffered(int userId, int talentId, bool isOffered)
+        {
+            // קריאה לרפוזיטורי לביצוע עדכון הסטטוס
+            _repository.UpdateIsOffered(userId, talentId, isOffered);
+        }
+
     }
 }

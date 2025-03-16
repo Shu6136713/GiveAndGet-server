@@ -29,13 +29,15 @@ namespace Services.Interfaces
         void DeleteTalentForUser(List<TalentUserDto> talents);
         List<TalentUserDto> GetTalentsByUserId(int userId);
         public void Delete(int userId, int talentId);
+        void UpdateIsOffered(int userId, int talentId, bool isOffered);
 
     }
 
     public interface IExchangeExtensionService : IService<ExchangeDto>
     {
         List<ExchangeDto> GetByUserId(int userId);
-        void SearchExhcahngesForUser(int userId);
+        void SearchExchangesForUser(int userId);
         void UpdateUserExchanges(int userId, List<int> removedTalentIds, List<int> addedTalentIds);
+
     }
 }

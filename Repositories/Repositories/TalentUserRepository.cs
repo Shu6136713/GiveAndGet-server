@@ -93,5 +93,23 @@ namespace Repositories.Repositories
             _context.Save();
 
         }
+
+        public void UpdateIsOffered(int userId, int talentId, bool isOffered)
+        {
+            // חיפוש הכישרון של המשתמש במסד הנתונים
+            var talentUser = _context.TalentUser
+                .FirstOrDefault(tu => tu.UserId == userId && tu.TalentId == talentId);
+
+            if (talentUser != null)
+            {
+                // אם הסטטוס השתנה - מעדכנים ושומרים
+                if (talentUser.IsOffered != isOffered)
+                {
+                    talentUser.IsOffered = isOffered;
+                    _context.Save();
+                }
+            }
+        }
+
     }
 }
