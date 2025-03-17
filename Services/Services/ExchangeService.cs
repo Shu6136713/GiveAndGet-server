@@ -65,21 +65,16 @@ namespace Services.Services
 
         public void SearchExchangesForUser(int userId)
         {
-            var exchanges = _repository.GetByUserId(userId);
-            var user = _userRepo.Get(userId);
-            var userTalents = _talentUserRepo.GetTalentsByUserId(userId);
+            List<Exchange> exchanges = _repository.GetByUserId(userId);
+            User user = _userRepo.Get(userId);
+            List<TalentUser> userTalents = _talentUserRepo.GetTalentsByUserId(userId);
 
-            var offeredTalents = userTalents.Where(t => t.IsOffered).ToList();
-            var requestedTalents = userTalents.Where(t => !t.IsOffered).ToList();
-
-            var allTalentUsers = _talentUserRepo.GetAll().ToList();
+            List<TalentUser> allTalentUsers = _talentUserRepo.GetAll();
             List<Exchange> newExchanges = new List<Exchange>();
 
-            ProcessTalentMatches(userId, user,userTalents,allTalentUsers,exchanges,newExchanges);
-            //ProcessTalentMatches(userId, user, offeredTalents, allTalentUsers, exchanges, newExchanges, isOffered: true);
-            //ProcessTalentMatches(userId, user, requestedTalents, allTalentUsers, exchanges, newExchanges, isOffered: false);
+            ProcessTalentMatches(userId, user, userTalents, allTalentUsers, exchanges, newExchanges);
 
-            foreach (var exchange in newExchanges)
+            foreach (Exchange exchange in newExchanges)
             {
                 _repository.AddItem(exchange);
             }
@@ -90,55 +85,66 @@ namespace Services.Services
         /// </summary>
         private void ProcessTalentMatches(int userId, User user, List<TalentUser> userTalents,
                                   List<TalentUser> allTalentUsers, List<Exchange> existingExchanges,
-                                  List<Exchange> newExchanges)//, bool isOffered)
+                                  List<Exchange> newExchanges)
         {
-            foreach (var talent in userTalents)
+            HashSet<(int, int, int, int)> existingPairs = new HashSet<(int, int, int, int)>(
+                existingExchanges.Select(e =>
+                    (Math.Min(e.User1Id, e.User2Id),
+                     Math.Max(e.User1Id, e.User2Id),
+                     Math.Min(e.Talent1Offered, e.Talent2Offered),
+                     Math.Max(e.Talent1Offered, e.Talent2Offered)))
+            );
+
+            foreach (TalentUser talent in userTalents)
             {
-                // חיפוש משתמשים שמבקשים את מה שאני מציע ולהפך
-                var potentialPartners = allTalentUsers
+                List<TalentUser> potentialPartners = allTalentUsers
                     .Where(t => t.TalentId == talent.TalentId && t.IsOffered != talent.IsOffered && t.UserId != userId)
                     .ToList();
 
-                foreach (var partner in potentialPartners)
+                foreach (TalentUser partner in potentialPartners)
                 {
-                    var partnerUser = _userRepo.Get(partner.UserId);
+                    User partnerUser = _userRepo.Get(partner.UserId);
 
-                    // מניעת עסקה בין גברים לנשים
                     if (user.Gender != partnerUser.Gender) continue;
-
-                    // בדיקה שהגילאים תואמים
                     if (!IsAgeMatch(user.Age, partnerUser.Age)) continue;
 
-                    // ***תיקון כאן: עכשיו מחפשים התאמה הפוכה ולא זהה!***
-                    var otherTalent = allTalentUsers.FirstOrDefault(t =>/**//**/
-                        t.UserId==partner.UserId && 
-                        (
-                            userTalents.FirstOrDefault(ut=> ut.TalentId == t.TalentId && ut.IsOffered != talent.IsOffered) != null
+                    List<TalentUser> otherTalents = allTalentUsers
+                        .Where(t =>
+                            t.TalentId != talent.TalentId &&
+                            t.UserId == partner.UserId &&
+                            userTalents.Any(ut => ut.TalentId == t.TalentId && ut.IsOffered != talent.IsOffered) &&
+                            t.IsOffered == talent.IsOffered
                         )
-                        && t.IsOffered != talent.IsOffered); // 🔄 הפוך ממה שמחפשים בצד השני
-                    
-                    if (otherTalent != null)
-                    {
-                        bool exists = existingExchanges.Any(e =>
-                            (e.User1Id == userId && e.User2Id == partner.UserId) ||
-                            (e.User1Id == partner.UserId && e.User2Id == userId));
+                        .ToList();
 
-                        if (!exists)
+                    foreach (TalentUser otherTalent in otherTalents)
+                    {
+                        var pairKey = (Math.Min(userId, partner.UserId),
+                                       Math.Max(userId, partner.UserId),
+                                       Math.Min(talent.TalentId, otherTalent.TalentId),
+                                       Math.Max(talent.TalentId, otherTalent.TalentId));
+
+                        if (!existingPairs.Contains(pairKey))
                         {
                             newExchanges.Add(new Exchange
                             {
                                 User1Id = userId,
-                                User2Id = partner.UserId,/***********/
+                                User2Id = partner.UserId,
                                 Talent1Offered = talent.IsOffered ? talent.TalentId : otherTalent.TalentId,
                                 Talent2Offered = talent.IsOffered ? otherTalent.TalentId : talent.TalentId,
                                 Status = StatusExchangeRep.NEW,
                                 DateCreated = DateTime.Now
                             });
+
+                            existingPairs.Add(pairKey);
                         }
                     }
                 }
             }
         }
+
+
+
 
 
         /// <summary>
@@ -162,22 +168,21 @@ namespace Services.Services
         public void UpdateUserExchanges(int userId, List<int> removedTalentIds, List<int> addedTalentIds)
         {
             // שליפת כל העסקאות של המשתמש
-            var userExchanges = _repository.GetByUserId(userId);
+            List<Exchange> userExchanges = _repository.GetByUserId(userId);
 
             // איתור עסקאות חדשות או עסקאות שממתינות לתגובה שכוללות כישרונות שהוסרו
-            var exchangesToDelete = userExchanges
-                .Where(e => e.Status.Equals(StatusExchange.NEW) || e.Status.Equals(StatusExchange.WAITING)) // מסננים רק עסקאות חדשות או ממתינות
-                .Where(e => removedTalentIds.Contains(e.Talent1Offered) || removedTalentIds.Contains(e.Talent2Offered)) // בודקים אם הכישרון בעסקה נמחק
+            List<Exchange> exchangesToDelete = userExchanges
+                .Where(e => e.Status.Equals(StatusExchange.NEW) || e.Status.Equals(StatusExchange.WAITING))
+                .Where(e => removedTalentIds.Contains(e.Talent1Offered) || removedTalentIds.Contains(e.Talent2Offered))
                 .ToList();
 
             // מחיקת העסקאות שמצאנו
-            foreach (var exchange in exchangesToDelete)
+            foreach (Exchange exchange in exchangesToDelete)
             {
                 _repository.Delete(exchange.Id);
             }
-            
+
             SearchExchangesForUser(userId);
-            
         }
 
 
