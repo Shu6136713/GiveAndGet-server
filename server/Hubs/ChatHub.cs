@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.SignalR;
+using Services.Dtos;
 using Services.Interfaces;
 using Services.Services;
 using System.Collections.Concurrent;
@@ -12,14 +13,28 @@ namespace WebAPI.Hubs
         private static ConcurrentDictionary<int, List<string>> connections = new();
 
         private readonly IChatService _chatService;
+        private readonly IExchangeForChat _exchangeService;
 
-        public ChatHub(IChatService chatService)
+        public ChatHub(IChatService chatService, IExchangeForChat exchangeService)
         {
             _chatService = chatService;
+            _exchangeService = exchangeService;
         }
 
+        // מתודת Join מצטרפת לצ'אט רק אם המשתמש שייך לעסקה
         public async Task Join(int userId, int exchangeId)
         {
+            // קודם כל, ודא שהמשתמש שייך לעסקה
+            bool isUserInExchange = await _exchangeService.IsUserInExchangeAsync(userId, exchangeId);
+
+            if (!isUserInExchange)
+            {
+                // אם המשתמש לא שייך לעסקה, דחה את הצטרפותו
+                await Clients.Caller.SendAsync("ErrorMessage", "You are not part of this exchange.");
+                return;
+            }
+
+            // אם המשתמש כן שייך לעסקה, הוסף אותו לחיבור
             if (!connections.ContainsKey(userId))
                 connections[userId] = new List<string>();
 
@@ -29,6 +44,7 @@ namespace WebAPI.Hubs
             await Groups.AddToGroupAsync(Context.ConnectionId, $"Exchange_{exchangeId}");
         }
 
+        // מתודה לשליחת הודעה בקבוצת הצ'אט
         public async Task SendMessage(int exchangeId, int fromUserId, string messageText)
         {
             // שמירת ההודעה ב-DB
@@ -39,6 +55,7 @@ namespace WebAPI.Hubs
                 .SendAsync("ReceiveMessage", fromUserId, messageText, DateTime.Now);
         }
 
+        // מתודה לניהול ניתוק המשתמש
         public override async Task OnDisconnectedAsync(System.Exception? exception)
         {
             var user = connections.FirstOrDefault(kvp => kvp.Value.Contains(Context.ConnectionId));
