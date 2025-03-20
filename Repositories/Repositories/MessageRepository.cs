@@ -1,4 +1,5 @@
-﻿using Repositories.Entity;
+﻿using Microsoft.EntityFrameworkCore;
+using Repositories.Entity;
 using Repositories.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -15,42 +16,44 @@ namespace Repositories.Repositories
             this.context = context;
         }
 
-        public Message AddItem(Message item)
+        public async Task<Message> AddItemAsync(Message item)
         {
-            context.Messages.Add(item);
-            context.Save();
-            return Get(item.Id);  // מחזיר את ההודעה אחרי שמירה
+            await context.Messages.AddAsync(item);
+            await context.SaveChangesAsync();
+            return await GetAsync(item.Id);
         }
 
-        public void Delete(int id)
+        public async Task DeleteAsync(int id)
         {
-            context.Messages.Remove(Get(id));  // מוחק הודעה לפי ID
-            context.Save();
+            var message = await GetAsync(id);
+            if (message != null)
+            {
+                context.Messages.Remove(message);
+                await context.SaveChangesAsync();
+            }
         }
 
-        public Message Get(int id)
+        public async Task<Message> GetAsync(int id)
         {
-            return context.Messages.FirstOrDefault(m => m.Id == id);  // מחזיר הודעה בודדת לפי ID
+            return await context.Messages.FirstOrDefaultAsync(m => m.Id == id);
         }
 
-        // לא משתמשים בו בצ'אט - לא נוגע
-        public List<Message> GetAll()
+        public Task<List<Message>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            throw new System.NotImplementedException();
         }
 
-        // ✅ שליפה של כל ההודעות לפי ExchangeId - צ'אט של עסקה
-        public List<Message> GetByExchangeId(int exchangeId)
+        public async Task<List<Message>> GetByExchangeIdAsync(int exchangeId)
         {
-            return context.Messages
+            return await context.Messages
                 .Where(m => m.ExchangeId == exchangeId)
                 .OrderBy(m => m.Time)
-                .ToList();
+                .ToListAsync();
         }
 
-        public Message Update(int id, Message entity)
+        public Task<Message> UpdateAsync(int id, Message entity)
         {
-            throw new NotImplementedException();  // אין צורך בצ'אט - לרוב לא עורכים הודעות
+            throw new System.NotImplementedException();
         }
     }
 }

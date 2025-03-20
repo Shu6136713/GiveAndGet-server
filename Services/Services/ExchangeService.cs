@@ -18,12 +18,12 @@ namespace Services.Services
     public class ExchangeService : IExchangeExtensionService
     {
         private readonly IExchangeExtensionRepository _repository;
-        private readonly IMessageExtensionRepository<User> _userRepo;
+        private readonly Repositories.Interfaces.IRepository<User> _userRepo;
         private readonly ITalentUserExtensionRepository _talentUserRepo;
         private readonly IMapper _mapper;
 
-        public ExchangeService(IExchangeExtensionRepository repository, 
-                                IMessageExtensionRepository<User> userRep,  
+        public ExchangeService(IExchangeExtensionRepository repository,
+                                Repositories.Interfaces.IRepository<User> userRep,  
                                     ITalentUserExtensionRepository talentUserRepo,
                                 IMapper mapper)
         {

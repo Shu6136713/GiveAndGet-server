@@ -11,11 +11,11 @@ using System.Threading.Tasks;
 
 namespace Services.Services
 {
-    public class UserService : IService<UserDto>
+    public class UserService : Interfaces.IService<UserDto>
     {
-        private readonly IMessageExtensionRepository<User> _repository;
+        private readonly Repositories.Interfaces.IRepository<User> _repository;
         private readonly IMapper _mapper;
-        public UserService(IMessageExtensionRepository<User> repository, IMapper mapper)
+        public UserService(Repositories.Interfaces.IRepository<User> repository, IMapper mapper)
         {
             this._repository = repository;
             this._mapper = mapper;

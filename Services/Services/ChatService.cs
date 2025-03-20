@@ -1,4 +1,5 @@
 ﻿using Services.Dtos;
+using Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,14 +10,14 @@ namespace Services.Services
 {
     public class ChatService
     {
-        private readonly MessageService _messageService;
+        private readonly IMessageExtensionService _messageService;
 
-        public ChatService(MessageService messageService)
+        public ChatService(IMessageExtensionService messageService)
         {
             _messageService = messageService;
         }
 
-        public void SaveMessage(int exchangeId, int fromUserId, string text)
+        public async Task SaveMessageAsync(int exchangeId, int fromUserId, string text)
         {
             var msgDto = new MessageDto
             {
@@ -25,13 +26,14 @@ namespace Services.Services
                 Text = text,
                 Time = DateTime.Now
             };
-            _messageService.AddItem(msgDto);
+            await _messageService.AddItemAsync(msgDto);
         }
 
-        public List<MessageDto> GetChatHistory(int exchangeId)
+        public async Task<List<MessageDto>> GetChatHistoryAsync(int exchangeId)
         {
-            return _messageService.GetByExchange(exchangeId);
+            return await _messageService.GetByExchangeIdAsync(exchangeId);
         }
     }
+
 
 }

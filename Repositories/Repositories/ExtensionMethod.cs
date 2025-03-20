@@ -15,13 +15,13 @@ namespace Repositories.Repositories
     {
         public static IServiceCollection AddRepository(this IServiceCollection services)
         {
-            services.AddScoped<IMessageExtensionRepository<Comment>, CommentRepository>();
-            services.AddScoped<IMessageExtensionRepository<Exchange>, ExchangeRepository>();
-            services.AddScoped<IMessageExtensionRepository<Message>, MessageRepository>();
-            services.AddScoped<IMessageExtensionRepository<Talent>, TalentRepository>();
-            services.AddScoped<IMessageExtensionRepository<TalentRequest>, TalentRequestRepository>();
-            services.AddScoped<IMessageExtensionRepository<User>, UserRepository>();
-            services.AddScoped<IMessageExtensionRepository<TalentUser>, TalentUserRepository>();
+            services.AddScoped<IRepository<Comment>, CommentRepository>();
+            services.AddScoped<IRepository<Exchange>, ExchangeRepository>();
+            services.AddScoped<IRepository<Message>, MessageRepository>();
+            services.AddScoped<IRepository<Talent>, TalentRepository>();
+            services.AddScoped<IRepository<TalentRequest>, TalentRequestRepository>();
+            services.AddScoped<IRepository<User>, UserRepository>();
+            services.AddScoped<IRepository<TalentUser>, TalentUserRepository>();
             services.AddScoped<ITalentExtensionRepository, TalentRepository>();
             services.AddScoped<ITalentUserExtensionRepository, TalentUserRepository>();
             services.AddScoped<IExchangeExtensionRepository, ExchangeRepository>();

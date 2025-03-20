@@ -18,41 +18,46 @@ namespace Services.Services
 
         public MessageService(IMessageExtensionRepository repository, IMapper mapper)
         {
-            this._repository = repository;
-            this._mapper = mapper;
+            _repository = repository;
+            _mapper = mapper;
         }
 
-        public MessageDto AddItem(MessageDto item)
+        public async Task<MessageDto> AddItemAsync(MessageDto item)
         {
-            return _mapper.Map<MessageDto>(_repository.AddItem(_mapper.Map<Message>(item)));
+            var entity = _mapper.Map<Message>(item);
+            var saved = await _repository.AddItemAsync(entity); // שמירה אסינכרונית ל-DB
+            return _mapper.Map<MessageDto>(saved);
         }
 
-        public void Delete(int id)
+        public async Task<List<MessageDto>> GetByExchangeIdAsync(int exchangeId)
         {
-            _repository.Delete(id);
+            var messages = await _repository.GetByExchangeIdAsync(exchangeId); // שליפת הודעות לפי עסקה
+            return _mapper.Map<List<MessageDto>>(messages);
         }
 
-        public MessageDto Get(int id)
+        public async Task<MessageDto> GetAsync(int id)
         {
-            return _mapper.Map<MessageDto>(_repository.Get(id));
+            var message = await _repository.GetAsync(id);
+            return _mapper.Map<MessageDto>(message);
         }
 
-        public List<MessageDto> GetAll()
+        public async Task<List<MessageDto>> GetAllAsync()
         {
-            return _mapper.Map<List<MessageDto>>(_repository.GetAll());
+            var allMessages = await _repository.GetAllAsync();
+            return _mapper.Map<List<MessageDto>>(allMessages);
         }
 
-        public MessageDto Update(int id, MessageDto item)
+        public async Task<MessageDto> UpdateAsync(int id, MessageDto item)
         {
-            return _mapper.Map<MessageDto>(_repository.Update(id, _mapper.Map<Message>(item)));
+            var entity = _mapper.Map<Message>(item);
+            var updated = await _repository.UpdateAsync(id, entity);
+            return _mapper.Map<MessageDto>(updated);
         }
 
-        public List<MessageDto> GetByExchangeId(int exchangeId)
+        public async Task DeleteAsync(int id)
         {
-            return _mapper.Map<List<MessageDto>>(
-                _repository.GetByExchangeId(exchangeId)
-            );
+            await _repository.DeleteAsync(id);
         }
-
     }
+
 }

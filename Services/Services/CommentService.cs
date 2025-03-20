@@ -12,12 +12,12 @@ using System.Threading.Tasks;
 
 namespace Services.Services
 {
-    public class CommentService : IService<CommentDto>
+    public class CommentService : Interfaces.IService<CommentDto>
     {
-        private readonly IMessageExtensionRepository<Comment> _repository;
+        private readonly Repositories.Interfaces.IRepository<Comment> _repository;
         private readonly IMapper _mapper;
 
-        public CommentService(IMessageExtensionRepository<Comment> repository, IMapper mapper)
+        public CommentService(Repositories.Interfaces.IRepository<Comment> repository, IMapper mapper)
         {
             this._repository = repository;
             this._mapper = mapper;
@@ -48,7 +48,7 @@ namespace Services.Services
             return _mapper.Map<CommentDto>(_repository.Update(id, _mapper.Map<Comment>(item)));
         }
 
-        CommentDto IService<CommentDto>.Get(int id)
+        CommentDto Interfaces.IService<CommentDto>.Get(int id)
         {
             throw new NotImplementedException();
         }
