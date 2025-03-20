@@ -34,6 +34,11 @@ namespace Mock
         {
             SaveChanges();
         }
+
+        public async Task SaveAsync()
+        {
+            await SaveChangesAsync();
+        }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlServer("server=sql;database=GiveAndGetDataB;trusted_connection=true");
