@@ -11,12 +11,12 @@ using System.Threading.Tasks;
 
 namespace Services.Services
 {
-    public class TalentRequestService : IService<TalentRequestDto>
+    public class TalentRequestService : Interfaces.IService<TalentRequestDto>
     {
-        private readonly IMessageExtensionRepository<TalentRequest> _repository;
+        private readonly Repositories.Interfaces.IRepository<TalentRequest> _repository;
         private readonly IMapper _mapper;
 
-        public TalentRequestService(IMessageExtensionRepository<TalentRequest> repository, IMapper mapper)
+        public TalentRequestService(Repositories.Interfaces.IRepository<TalentRequest> repository, IMapper mapper)
         {
             this._repository = repository;
             this._mapper = mapper;

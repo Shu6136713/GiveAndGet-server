@@ -18,6 +18,17 @@ namespace Services.Interfaces
 
 
     }
+
+    public interface IServiceAsync<T>
+    {
+        Task<T> AddItemAsync(T item);
+        Task<T> GetAsync(int id);
+        Task<List<T>> GetAllAsync();
+        Task<T> UpdateAsync(int id, T entity);
+        Task DeleteAsync(int id);
+    }
+
+
     public interface ITalentExtensionService : IService<TalentDto>
     {
         List<TalentDto> GetByParentCategory(int parentCategoryId);
@@ -40,9 +51,9 @@ namespace Services.Interfaces
         void UpdateUserExchanges(int userId, List<int> removedTalentIds, List<int> addedTalentIds);
 
     }
-
-    public interface IMessageExtensionService : IService<MessageDto>
+    /********************************************************************/
+    public interface IMessageExtensionService : IServiceAsync<MessageDto>
     {
-        List<MessageDto> GetByExchangeId(int exchangeId);
+        Task<List<MessageDto>> GetByExchangeIdAsync(int exchangeId);
     }
 }

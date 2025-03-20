@@ -17,7 +17,7 @@ namespace WebAPI.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly IService<UserDto> _userService;
+        private readonly Services.Interfaces.IService<UserDto> _userService;
         private readonly ITalentUserExtensionService _talentUserService;
         private readonly ITalentExtensionService _talentService;
         private readonly IExchangeExtensionService _exchangeService;
@@ -25,7 +25,7 @@ namespace WebAPI.Controllers
         public static string _directory = Path.Combine(Environment.CurrentDirectory, "Images");
         
 
-        public UserController(IService<UserDto> userService, 
+        public UserController(Services.Interfaces.IService<UserDto> userService, 
             ITalentUserExtensionService talentUserService,
             IExchangeExtensionService exchangeService,
             ITalentExtensionService talentExtensionService,
