@@ -26,5 +26,7 @@ namespace Repositories.Interfaces
 
 
         void Save();
+
+        Task SaveAsync();
     }
 }

@@ -17,7 +17,7 @@ namespace Repositories.Repositories
         {
             services.AddScoped<IRepository<Comment>, CommentRepository>();
             services.AddScoped<IRepository<Exchange>, ExchangeRepository>();
-            services.AddScoped<IRepository<Message>, MessageRepository>();
+            services.AddScoped<IRepositoryAsync<Message>, MessageRepository>();
             services.AddScoped<IRepository<Talent>, TalentRepository>();
             services.AddScoped<IRepository<TalentRequest>, TalentRequestRepository>();
             services.AddScoped<IRepository<User>, UserRepository>();

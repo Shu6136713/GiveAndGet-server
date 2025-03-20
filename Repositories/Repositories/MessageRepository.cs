@@ -19,7 +19,7 @@ namespace Repositories.Repositories
         public async Task<Message> AddItemAsync(Message item)
         {
             await context.Messages.AddAsync(item);
-            await context.SaveChangesAsync();
+            await context.SaveAsync();
             return await GetAsync(item.Id);
         }
 
@@ -29,7 +29,7 @@ namespace Repositories.Repositories
             if (message != null)
             {
                 context.Messages.Remove(message);
-                await context.SaveChangesAsync();
+                await context.SaveAsync();
             }
         }
 

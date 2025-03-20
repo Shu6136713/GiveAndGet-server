@@ -29,7 +29,6 @@ namespace Services.Services
                     src => src.MapFrom(i => i.File != null ? i.File.FileName : "default_profile_image.png")); // Default profile image          
             // others - only from server to client
             CreateMap<Comment, CommentDto>().ReverseMap();
-            CreateMap<Connection, ConnectionDto>().ReverseMap();
             CreateMap<Exchange, ExchangeDto>().ReverseMap();
             CreateMap<Message, MessageDto>().ReverseMap();
             CreateMap<Talent, TalentDto>().ReverseMap();

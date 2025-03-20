@@ -16,17 +16,7 @@ namespace Repositories.Interfaces
         void Delete(int id);
     }
 
-    public interface IRepositoryAsync<T>
-    {
-        Task<List<T>> GetAllAsync();
-        Task<T> GetAsync(int id);
-        Task<T> AddItemAsync(T item);
-        Task<T> UpdateAsync(int id, T entity);
-        Task DeleteAsync(int id);
-    }
-
-        
-
+    
     public interface ITalentExtensionRepository : IRepository<Talent>
     {
         List<Talent> GetByParentId(int parentId);
@@ -48,9 +38,5 @@ namespace Repositories.Interfaces
 
     }
 
-    public interface IMessageExtensionRepository : IRepositoryAsync<Message>
-    {
-        Task<List<Message>> GetByExchangeIdAsync(int exchangeId);
-
-    }
+    
 } 
