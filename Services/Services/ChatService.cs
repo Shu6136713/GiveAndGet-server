@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Services.Services
 {
-    public class ChatService
+    public class ChatService : IChatService
     {
         private readonly IMessageExtensionService _messageService;
 
@@ -26,12 +26,12 @@ namespace Services.Services
                 Text = text,
                 Time = DateTime.Now
             };
-            await _messageService.AddItemAsync(msgDto);
+            await _messageService.AddItemAsync(msgDto); // שמירה אסינכרונית
         }
 
         public async Task<List<MessageDto>> GetChatHistoryAsync(int exchangeId)
         {
-            return await _messageService.GetByExchangeIdAsync(exchangeId);
+            return await _messageService.GetByExchangeIdAsync(exchangeId); // שליפת היסטוריה של הצ'אט
         }
     }
 

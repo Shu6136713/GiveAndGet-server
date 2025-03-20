@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace Services.Interfaces
 {
-    internal interface IEmailService
+    public interface IEmailService
     {
+
     }
 }
