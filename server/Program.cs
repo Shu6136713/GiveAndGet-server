@@ -8,6 +8,7 @@ using Repositories.Repositories;
 using Services.Interfaces;
 using Services.Services;
 using System.Text;
+using WebAPI.Hubs;
 
 namespace server
 {
@@ -58,9 +59,11 @@ namespace server
             builder.Services.AddRepository();
             builder.Services.AddDbContext<IContext, GiveAndGetDataBase>();
 
+
             // JWT Authentication
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
+                {
                     options.TokenValidationParameters = new TokenValidationParameters()
                     {
                         ValidateAudience = true,
@@ -69,8 +72,26 @@ namespace server
                         ValidIssuer = builder.Configuration["Jwt:Issuer"],
                         ValidAudience = builder.Configuration["Jwt:Audience"],
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
-                    }
-                );
+                    };
+
+                    // הוספת תמיכה ב-token שמגיע מ-query string של ה-SignalR Hub
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = context =>
+                        {
+                            var accessToken = context.Request.Query["access_token"];
+                            var path = context.HttpContext.Request.Path;
+
+                            // אם הבקשה היא ל-chatHub ויש טוקן ב-query string - נשתמש בו
+                            if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/chatHub"))
+                            {
+                                context.Token = accessToken;
+                            }
+                            return Task.CompletedTask;
+                        }
+                    };
+                });
+
 
             // CORS policy
             var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
@@ -90,6 +111,8 @@ namespace server
             //signal r
             builder.Services.AddSignalR();
 
+            
+            
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -104,6 +127,10 @@ namespace server
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseCors(MyAllowSpecificOrigins);
+
+
+            // צירוף החיבורים בזמן אמת עם SignalR
+            app.MapHub<ChatHub>("/chatHub");  // מיפוי של ה-Hub לצ'אט
 
             app.MapControllers();
 
