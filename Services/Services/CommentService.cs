@@ -14,10 +14,10 @@ namespace Services.Services
 {
     public class CommentService : IService<CommentDto>
     {
-        private readonly IRepository<Comment> _repository;
+        private readonly IMessageExtensionRepository<Comment> _repository;
         private readonly IMapper _mapper;
 
-        public CommentService(IRepository<Comment> repository, IMapper mapper)
+        public CommentService(IMessageExtensionRepository<Comment> repository, IMapper mapper)
         {
             this._repository = repository;
             this._mapper = mapper;

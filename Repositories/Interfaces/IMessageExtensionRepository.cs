@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Repositories.Interfaces
 {
-    public interface IRepository<T>
+    public interface IMessageExtensionRepository<T>
     {
         List<T> GetAll();
         T Get(int id);
@@ -16,12 +16,12 @@ namespace Repositories.Interfaces
         void Delete(int id);
     }
 
-    public interface ITalentExtensionRepository : IRepository<Talent>
+    public interface ITalentExtensionRepository : IMessageExtensionRepository<Talent>
     {
         List<Talent> GetByParentId(int parentId);
     }
 
-    public interface ITalentUserExtensionRepository : IRepository<TalentUser>
+    public interface ITalentUserExtensionRepository : IMessageExtensionRepository<TalentUser>
     {
         List<TalentUser> AddTalentsForUser(List<TalentUser> talents);
         void DeleteTalentForUser(List<TalentUser> talents);
@@ -31,9 +31,14 @@ namespace Repositories.Interfaces
 
     }
 
-    public interface IExchangeExtensionRepository: IRepository<Exchange>
+    public interface IExchangeExtensionRepository: IMessageExtensionRepository<Exchange>
     {
         List<Exchange> GetByUserId(int userId);
 
+    }
+
+    public interface IMessageExtensionRepository : IMessageExtensionRepository<Message>
+    {
+        List<Message> GetByExchangeId(int exchangeId);
     }
 } 

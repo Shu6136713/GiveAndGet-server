@@ -11,12 +11,12 @@ using System.Threading.Tasks;
 
 namespace Services.Services
 {
-    public class MessageService : IService<MessageDto>
+    public class MessageService : IMessageExtensionService
     {
-        private readonly IRepository<Message> _repository;
+        private readonly IMessageExtensionRepository _repository;
         private readonly IMapper _mapper;
 
-        public MessageService(IRepository<Message> repository, IMapper mapper)
+        public MessageService(IMessageExtensionRepository repository, IMapper mapper)
         {
             this._repository = repository;
             this._mapper = mapper;
@@ -46,5 +46,13 @@ namespace Services.Services
         {
             return _mapper.Map<MessageDto>(_repository.Update(id, _mapper.Map<Message>(item)));
         }
+
+        public List<MessageDto> GetByExchangeId(int exchangeId)
+        {
+            return _mapper.Map<List<MessageDto>>(
+                _repository.GetByExchangeId(exchangeId)
+            );
+        }
+
     }
 }

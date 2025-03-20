@@ -40,4 +40,9 @@ namespace Services.Interfaces
         void UpdateUserExchanges(int userId, List<int> removedTalentIds, List<int> addedTalentIds);
 
     }
+
+    public interface IMessageExtensionService : IService<MessageDto>
+    {
+        List<MessageDto> GetByExchangeId(int exchangeId);
+    }
 }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Mock;
 
@@ -11,9 +12,10 @@ using Mock;
 namespace Mock.Migrations
 {
     [DbContext(typeof(GiveAndGetDataBase))]
-    partial class GiveAndGetDataBaseModelSnapshot : ModelSnapshot
+    [Migration("20250319210557_change-the-message-according-to-signalr")]
+    partial class changethemessageaccordingtosignalr
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

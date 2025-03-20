@@ -13,10 +13,10 @@ namespace Services.Services
 {
     public class TalentRequestService : IService<TalentRequestDto>
     {
-        private readonly IRepository<TalentRequest> _repository;
+        private readonly IMessageExtensionRepository<TalentRequest> _repository;
         private readonly IMapper _mapper;
 
-        public TalentRequestService(IRepository<TalentRequest> repository, IMapper mapper)
+        public TalentRequestService(IMessageExtensionRepository<TalentRequest> repository, IMapper mapper)
         {
             this._repository = repository;
             this._mapper = mapper;

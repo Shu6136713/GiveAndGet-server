@@ -87,6 +87,9 @@ namespace server
                     });
             });
 
+            //signal r
+            builder.Services.AddSignalR();
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
