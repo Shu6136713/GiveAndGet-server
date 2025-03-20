@@ -156,6 +156,7 @@ namespace WebAPI.Controllers
 
 
         // PUT api/<UserController>/5
+        [Authorize]
         [HttpPut("{id}")]
         public UserDto Put(int id, [FromForm] UserDto updateUser, [FromForm] string talents)
         {
