@@ -26,7 +26,7 @@ namespace Services.Services
             services.AddScoped<IExchangeExtensionService, ExchangeService>();
             services.AddScoped<IMessageExtensionService, MessageService>();
             services.AddScoped<IChatService, ChatService>();
-            services.AddScoped<EmailService>();
+            services.AddScoped<IEmailService, EmailService>();
             services.AddAutoMapper(typeof(MyMapper));
 
             return services;
