@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Repositories.Entity;
 using Repositories.Interfaces;
+using Repositories.Repositories;
 using Services.Dtos;
 using Services.Interfaces;
 using System;
@@ -15,7 +16,7 @@ using StatusExchangeRep = Repositories.Entity.StatusExchange;
 
 namespace Services.Services
 {
-    public class ExchangeService : IExchangeExtensionService
+    public class ExchangeService : IExchangeExtensionService, IExchangeForChat
     {
         private readonly IExchangeExtensionRepository _repository;
         private readonly Repositories.Interfaces.IRepository<User> _userRepo;
@@ -188,6 +189,21 @@ namespace Services.Services
 
 
 
+
+
+        //the asyncronic part
+        public async Task<bool> IsUserInExchangeAsync(int userId, int exchangeId)
+        {
+            // שימוש ב-Task.Run כדי להריץ את המתודה הסינכרונית בצורה אסינכרונית
+            Exchange exchange = await Task.Run(() => _repository.Get(exchangeId));
+
+            if (exchange == null)
+            {
+                return false;
+            }
+
+            return exchange.User1Id==userId || exchange.User2Id==userId;
+        }
 
 
     }
