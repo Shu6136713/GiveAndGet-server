@@ -3,14 +3,13 @@ using Repositories.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Repositories.Repositories
 {
-    public class MessageRepository : IRepository<Message>
+    public class MessageRepository : IMessageExtensionRepository
     {
         private readonly IContext context;
+
         public MessageRepository(IContext context)
         {
             this.context = context;
@@ -20,36 +19,38 @@ namespace Repositories.Repositories
         {
             context.Messages.Add(item);
             context.Save();
-            return Get(item.Id);
+            return Get(item.Id);  // מחזיר את ההודעה אחרי שמירה
         }
 
         public void Delete(int id)
         {
-            context.Messages.Remove(Get(id));
+            context.Messages.Remove(Get(id));  // מוחק הודעה לפי ID
             context.Save();
         }
 
         public Message Get(int id)
         {
-            return context.Messages.FirstOrDefault(m => m.Id == id);
+            return context.Messages.FirstOrDefault(m => m.Id == id);  // מחזיר הודעה בודדת לפי ID
         }
 
+        // לא משתמשים בו בצ'אט - לא נוגע
         public List<Message> GetAll()
         {
             throw new NotImplementedException();
         }
 
-        public List<Message> GetByUserIds(int id1,int id2)
+        // ✅ שליפה של כל ההודעות לפי ExchangeId - צ'אט של עסקה
+        public List<Message> GetByExchangeId(int exchangeId)
         {
-            return context.Messages.
-                Where(m => (m.FromId == id1 && m.ToId == id2) || (m.FromId == id2 && m.ToId == id1))
-                .OrderBy(t=>t.Time)
+            return context.Messages
+                .Where(m => m.ExchangeId == exchangeId)
+                .OrderBy(m => m.Time)
                 .ToList();
         }
 
         public Message Update(int id, Message entity)
         {
-            throw new NotImplementedException();
+            throw new NotImplementedException();  // אין צורך בצ'אט - לרוב לא עורכים הודעות
         }
     }
 }

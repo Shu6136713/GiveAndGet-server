@@ -13,9 +13,9 @@ namespace Services.Services
 {
     public class UserService : IService<UserDto>
     {
-        private readonly IRepository<User> _repository;
+        private readonly IMessageExtensionRepository<User> _repository;
         private readonly IMapper _mapper;
-        public UserService(IRepository<User> repository, IMapper mapper)
+        public UserService(IMessageExtensionRepository<User> repository, IMapper mapper)
         {
             this._repository = repository;
             this._mapper = mapper;

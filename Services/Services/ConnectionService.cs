@@ -13,10 +13,10 @@ namespace Services.Services
 {
     public class ConnectionService : IService<ConnectionDto>
     {
-        private readonly IRepository<Connection> _repository;
+        private readonly IMessageExtensionRepository<Connection> _repository;
         private readonly IMapper _mapper;
 
-        public ConnectionService(IRepository<Connection> repository, IMapper mapper)
+        public ConnectionService(IMessageExtensionRepository<Connection> repository, IMapper mapper)
         {
             this._repository = repository;
             this._mapper = mapper;

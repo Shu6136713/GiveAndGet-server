@@ -12,7 +12,7 @@ namespace Services.Dtos
     {
         public int Id { get; set; }
         public int FromId { get; set; }
-        public int ToId { get; set; }
+        public int ExchangeId { get; set; }
         public string Text { get; set; }
         public bool Readed { get; set; }
         public DateTime Time { get; set; }

@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Repositories.Repositories
 {
-    public class ConnectionRepository : IRepository<Connection>
+    public class ConnectionRepository : IMessageExtensionRepository<Connection>
     {
         private readonly IContext context;
 

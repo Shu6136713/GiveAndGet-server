@@ -14,9 +14,11 @@ namespace Repositories.Entity
         [ForeignKey("FromId")]
         public virtual User? From { get; set; }
 
-        public int ToId { get; set; }
-        [ForeignKey("ToId")]
-        public virtual User? To { get; set; }
+        //for which exchange it belongs
+        public int ExchangeId { get; set; }
+        [ForeignKey("ExchangeId")]
+        public virtual Exchange Exchange { get; set; }
+
         public string Text { get; set; }
         public bool Readed { get; set; }
         public DateTime Time { get; set; } = DateTime.Now;

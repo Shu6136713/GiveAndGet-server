@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Repositories.Repositories
 {
-    public class UserRepository:IRepository<User>
+    public class UserRepository:IMessageExtensionRepository<User>
     {
         private readonly IContext _context;
 
