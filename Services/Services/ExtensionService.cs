@@ -15,7 +15,7 @@ namespace Services.Services
             services.AddRepository();
             services.AddScoped<IService<CommentDto>, CommentService>();
             services.AddScoped<IService<ExchangeDto>, ExchangeService>();
-            services.AddScoped<IService<MessageDto>, MessageService>();
+            services.AddScoped<IServiceAsync<MessageDto>, MessageService>();
             services.AddScoped<IService<TalentDto>, TalentService>();
             services.AddScoped<IService<TalentRequestDto>, TalentRequestService>();
             services.AddScoped<IService<UserDto>, UserService>();
@@ -25,7 +25,7 @@ namespace Services.Services
             services.AddScoped<ITalentUserExtensionService, TalentUserService>();
             services.AddScoped<IExchangeExtensionService, ExchangeService>();
             services.AddScoped<IMessageExtensionService, MessageService>();
-            services.AddScoped<ChatService, ChatService>();
+            services.AddScoped<IChatService, ChatService>();
             services.AddScoped<EmailService>();
             services.AddAutoMapper(typeof(MyMapper));
 
