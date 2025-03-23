@@ -40,7 +40,6 @@ namespace WebAPI.Controllers
         [HttpPost]
         public IActionResult Post([FromForm] string content)//CommentDto comment)
         {
-            //token
             try
             {
                 var userIdFromToken = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;

@@ -38,5 +38,9 @@ namespace Repositories.Interfaces
 
     }
 
-    
+    public interface ILoginRepository
+    {
+        User VerifyUser(string userName, string password);
+    }
+
 } 

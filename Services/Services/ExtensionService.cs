@@ -5,6 +5,7 @@ using Repositories.Interfaces;
 using Repositories.Repositories;
 using Services.Dtos;
 using Services.Interfaces;
+using System;
 
 namespace Services.Services
 {
@@ -27,7 +28,15 @@ namespace Services.Services
             services.AddScoped<IMessageExtensionService, MessageService>();
             services.AddScoped<IChatService, ChatService>();
             services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<ILoginService, LoginService>();
+
             services.AddAutoMapper(typeof(MyMapper));
+
+            services.AddScoped<IUserService, UserService>();
+
+            // שימוש ב-Lazy<T> להזרקת השירותים
+            services.AddScoped(provider => new Lazy<IService<TalentRequestDto>>(() => provider.GetRequiredService<IService<TalentRequestDto>>()));
+            services.AddScoped(provider => new Lazy<IUserService>(() => provider.GetRequiredService<IUserService>()));
 
             return services;
         }
