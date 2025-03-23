@@ -6,6 +6,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using StatusExchange = Repositories.Entity.StatusExchange;
 
 namespace Services.Interfaces
 {
@@ -42,6 +43,8 @@ namespace Services.Interfaces
         List<ExchangeDto> GetByUserId(int userId);
         void SearchExchangesForUser(int userId);
         void UpdateUserExchanges(int userId, List<int> removedTalentIds, List<int> addedTalentIds);
+        public ExchangeDto UpdateStatus(int id, StatusExchange status);
+
 
     }
 

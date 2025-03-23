@@ -8,6 +8,9 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using StatusExchange = Services.Dtos.StatusExchange;
+using StatusExchangeRep = Repositories.Entity.StatusExchange;
+
 
 namespace WebAPI.Controllers
 {
@@ -56,6 +59,20 @@ namespace WebAPI.Controllers
         public List<ExchangeDto> SearchDealsByUser(/*[FromQuery] DealSearchDto searchDto*/ [FromQuery] int userId)
         {
             return _exchangeService.GetByUserId(userId);
+        }
+
+        [Authorize]
+        [HttpPut("update-status")]
+        public IActionResult UpdateExchangeStatus(int exchangeId, int status)
+        {
+            var exchange = _exchangeService.Get(exchangeId);
+            if (exchange == null)
+            {
+                return NotFound("Exchange not found.");
+            }
+
+            var updatedExchange = _exchangeService.UpdateStatus(exchangeId, (StatusExchangeRep)status);
+            return Ok(updatedExchange);
         }
     }
 }

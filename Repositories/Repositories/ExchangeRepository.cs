@@ -1,4 +1,5 @@
-﻿using Repositories.Entity;
+﻿using Microsoft.EntityFrameworkCore;
+using Repositories.Entity;
 using Repositories.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -55,6 +56,16 @@ namespace Repositories.Repositories
             context.Save();
             return Get(id);
 
+        }
+
+        public Exchange UpdateStatus(int id, StatusExchange status)
+        {
+            var exchange = context.Exchanges.Find(id);
+            if (exchange == null) return null;
+
+            exchange.Status = status;
+            context.Save();
+            return exchange;
         }
     }
 }

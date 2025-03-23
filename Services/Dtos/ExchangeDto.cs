@@ -10,10 +10,10 @@ namespace Services.Dtos
 {
     public enum StatusExchange
     {
-        NEW,
-        WAITING,
-        PROCCESSING,
-        DONE
+        NEW=0,
+        WAITING=1,
+        PROCCESSING=2,
+        DONE=3
     }
     public class ExchangeDto
     {

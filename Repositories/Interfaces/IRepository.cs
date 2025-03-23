@@ -35,6 +35,8 @@ namespace Repositories.Interfaces
     public interface IExchangeExtensionRepository: IRepository<Exchange>
     {
         List<Exchange> GetByUserId(int userId);
+        Exchange UpdateStatus(int id, StatusExchange status);
+
 
     }
 
