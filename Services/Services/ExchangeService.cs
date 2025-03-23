@@ -205,7 +205,10 @@ namespace Services.Services
             return exchange.User1Id==userId || exchange.User2Id==userId;
         }
 
-
+        public ExchangeDto UpdateStatus(int id, StatusExchangeRep status)
+        {
+            var exchange = _repository.UpdateStatus(id, status);
+            return _mapper.Map<ExchangeDto>(exchange);
+        }
     }
 }
-

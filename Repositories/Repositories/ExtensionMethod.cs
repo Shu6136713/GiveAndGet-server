@@ -26,6 +26,8 @@ namespace Repositories.Repositories
             services.AddScoped<ITalentUserExtensionRepository, TalentUserRepository>();
             services.AddScoped<IExchangeExtensionRepository, ExchangeRepository>();
             services.AddScoped<IMessageExtensionRepository, MessageRepository>();
+            services.AddScoped<ILoginRepository, LoginRepository>();
+
             return services;
         }
     }

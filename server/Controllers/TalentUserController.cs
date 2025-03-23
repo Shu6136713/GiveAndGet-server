@@ -10,10 +10,13 @@ namespace YourNamespace.Controllers
     public class TalentUserController : ControllerBase
     {
         private readonly ITalentUserExtensionService _talentUserService;
+        private readonly ILoginService _loginService;
 
-        public TalentUserController(ITalentUserExtensionService talentUserService)
+
+        public TalentUserController(ITalentUserExtensionService talentUserService, ILoginService loginService)
         {
             _talentUserService = talentUserService;
+            _loginService = loginService;
         }
 
         [Authorize]
@@ -23,6 +26,11 @@ namespace YourNamespace.Controllers
             if (talents == null || !talents.Any())
                 return BadRequest("The talent list cannot be empty.");
 
+            if (!_loginService.ValidateUserId(User, talents.First().UserId))
+            {
+                return Unauthorized("User ID does not match the token.");
+            }
+
             var updatedTalents = _talentUserService.AddTalentsForUser(talents);
             return Ok(updatedTalents);
         }
@@ -31,6 +39,10 @@ namespace YourNamespace.Controllers
         [HttpGet("getTalents/{userId}")]
         public ActionResult<List<TalentUserDto>> GetTalentsByUserId(int userId)
         {
+            if (!_loginService.ValidateUserId(User, userId))
+            {
+                return Unauthorized("User ID does not match the token.");
+            }
             var talents = _talentUserService.GetTalentsByUserId(userId);
             if (talents == null || !talents.Any())
                 return NotFound("No talents found for the given user.");
@@ -44,6 +56,12 @@ namespace YourNamespace.Controllers
         {
             if (talent == null)
                 return BadRequest("Talent data is required.");
+
+            if (!_loginService.ValidateUserId(User, talent.UserId))
+            {
+                return Unauthorized("User ID does not match the token.");
+            }
+
 
             var addedTalent = _talentUserService.AddItem(talent);
             return Ok(addedTalent);
@@ -63,6 +81,11 @@ namespace YourNamespace.Controllers
         {
             if (talent == null)
                 return BadRequest("Talent data is required.");
+
+            if (!_loginService.ValidateUserId(User, talent.UserId))
+            {
+                return Unauthorized("User ID does not match the token.");
+            }
 
             var updatedTalent = _talentUserService.Update(id, talent);
             return Ok(updatedTalent);

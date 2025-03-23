@@ -3,8 +3,10 @@ using Services.Dtos;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using StatusExchange = Repositories.Entity.StatusExchange;
 
 namespace Services.Interfaces
 {
@@ -23,6 +25,7 @@ namespace Services.Interfaces
     public interface ITalentExtensionService : IService<TalentDto>
     {
         List<TalentDto> GetByParentCategory(int parentCategoryId);
+        void ProcessTalentRequest(int id);
     }
 
     public interface ITalentUserExtensionService : IService<TalentUserDto>
@@ -40,9 +43,27 @@ namespace Services.Interfaces
         List<ExchangeDto> GetByUserId(int userId);
         void SearchExchangesForUser(int userId);
         void UpdateUserExchanges(int userId, List<int> removedTalentIds, List<int> addedTalentIds);
+        public ExchangeDto UpdateStatus(int id, StatusExchange status);
+
 
     }
-    
+
+    public interface IUserService : IService<UserDto>
+    {
+        UserDto GetUserProfile(ClaimsPrincipal user, string host);
+        UserDto AddUser(UserDto user, string talents);
+        UserDto UpdateUser(int id, UserDto updateUser, string talents);
+        UserDto UpdateUserScore(int id, int action);
+        byte[] GetProfileImage(int id);
+    }
+
+    public interface ILoginService
+    {
+        string GenerateToken(UserDto user);
+        UserDto Verify(string name, string pwd);
+        bool ValidateUserId(ClaimsPrincipal user, int userId);
+
+    }
 
 
 }
