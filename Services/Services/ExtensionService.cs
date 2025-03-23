@@ -16,6 +16,7 @@ namespace Services.Services
             services.AddScoped<IService<CommentDto>, CommentService>();
             services.AddScoped<IService<ExchangeDto>, ExchangeService>();
             services.AddScoped<IServiceAsync<MessageDto>, MessageService>();
+            services.AddScoped<IExchangeForChat, ExchangeService>();
             services.AddScoped<IService<TalentDto>, TalentService>();
             services.AddScoped<IService<TalentRequestDto>, TalentRequestService>();
             services.AddScoped<IService<UserDto>, UserService>();
@@ -32,4 +33,6 @@ namespace Services.Services
             return services;
         }
     }
+    
+        
 }

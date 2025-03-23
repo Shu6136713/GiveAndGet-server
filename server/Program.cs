@@ -1,3 +1,4 @@
+
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -74,23 +75,30 @@ namespace server
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
                     };
 
-                    // הוספת תמיכה ב-token שמגיע מ-query string של ה-SignalR Hub
+                    // כאן אנחנו מטפלים בכיצד ה-token יתקבל
                     options.Events = new JwtBearerEvents
                     {
                         OnMessageReceived = context =>
                         {
-                            var accessToken = context.Request.Query["access_token"];
                             var path = context.HttpContext.Request.Path;
-
-                            // אם הבקשה היא ל-chatHub ויש טוקן ב-query string - נשתמש בו
-                            if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/chatHub"))
+                            if (path.StartsWithSegments("/chatHub"))
                             {
+                                // תומך גם בטוקן שמגיע ב-query
+                                var accessToken = context.Request.Query["access_token"];
+                                if (string.IsNullOrEmpty(accessToken))
+                                {
+                                    // אם אין ב-query, נבדוק ב-Authorization Header
+                                    accessToken = context.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+                                }
                                 context.Token = accessToken;
                             }
                             return Task.CompletedTask;
                         }
                     };
                 });
+
+
+
 
 
             // CORS policy
@@ -109,10 +117,16 @@ namespace server
             });
 
             //signal r
-            builder.Services.AddSignalR();
+            builder.Services.AddSignalR()
+                .AddHubOptions<ChatHub>(options =>
+                {
+                    options.EnableDetailedErrors = true;
+                });
 
-            
-            
+            builder.WebHost.UseUrls("https://localhost:7160");
+
+
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -124,9 +138,13 @@ namespace server
 
             app.UseHttpsRedirection();
 
+            app.UseRouting();
+
+            
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseCors(MyAllowSpecificOrigins);
+
 
 
             // צירוף החיבורים בזמן אמת עם SignalR

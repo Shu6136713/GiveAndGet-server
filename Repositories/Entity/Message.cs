@@ -21,7 +21,7 @@ namespace Repositories.Entity
 
         public string Text { get; set; }
         public bool Readed { get; set; }
-        public DateTime Time { get; set; } = DateTime.Now;
+        public DateTime? Time { get; set; } = DateTime.Now;
 
     }
 }

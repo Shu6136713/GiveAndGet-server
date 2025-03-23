@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Services.Interfaces;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -16,9 +17,11 @@ namespace WebAPI.Controllers
             _chatService = chatService;
         }
 
+        [Authorize]
         [HttpGet("history/{exchangeId}")]
         public async Task<IActionResult> GetChatHistory(int exchangeId)
         {
+
             var history = await _chatService.GetChatHistoryAsync(exchangeId);
             return Ok(history);
         }

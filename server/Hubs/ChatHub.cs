@@ -26,6 +26,7 @@ namespace WebAPI.Hubs
 
         public async Task Join(int userId, int exchangeId)
         {
+            Console.WriteLine($"{userId} - {exchangeId}");
             // קודם כל, ודא שהמשתמש שייך לעסקה
             bool isUserInExchange = await _exchangeService.IsUserInExchangeAsync(userId, exchangeId);
 
@@ -39,7 +40,7 @@ namespace WebAPI.Hubs
             // אם המשתמש כן שייך לעסקה, הוסף אותו לחיבור
             if (!connections.ContainsKey(userId))
                 connections[userId] = new List<string>();
-
+            Console.WriteLine(connections[userId].ToString());
             connections[userId].Add(Context.ConnectionId);
 
             // צירוף לקבוצה לפי ExchangeId מאפשר שידור ממוקד
@@ -70,5 +71,39 @@ namespace WebAPI.Hubs
 
             await base.OnDisconnectedAsync(exception);
         }
+
+        //התחברות
+        public override async Task OnConnectedAsync()
+        {
+            // קודם כל מנסה לשלוף מה-Query כי SignalR ב-Client שולח שם את ה-token
+            var token = Context.GetHttpContext()?.Request.Query["access_token"].ToString();
+
+            // אם לא הגיע ב-query, ננסה מה-Authorization Header
+            if (string.IsNullOrEmpty(token))
+            {
+                var authHeader = Context.GetHttpContext()?.Request.Headers["Authorization"].ToString();
+                if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer "))
+                {
+                    token = authHeader.Substring("Bearer ".Length).Trim();
+                }
+            }
+
+            // הדפסת הטוקן למעקב - חשוב לוודא מה באמת התקבל
+            if (string.IsNullOrEmpty(token))
+            {
+                Console.WriteLine("Token is null or empty");
+            }
+            else
+            {
+                Console.WriteLine("Token received:");
+                Console.WriteLine(token);
+            }
+
+            await base.OnConnectedAsync();
+        }
+
+
     }
+
+
 }
