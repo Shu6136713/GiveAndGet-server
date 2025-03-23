@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.SignalR;
 using Services.Dtos;
 using Services.Interfaces;
 using Services.Services;
@@ -7,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace WebAPI.Hubs
 {
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class ChatHub : Hub
     {
         // שמירת חיבורים בזיכרון - לא ב-DB
@@ -21,7 +24,6 @@ namespace WebAPI.Hubs
             _exchangeService = exchangeService;
         }
 
-        // מתודת Join מצטרפת לצ'אט רק אם המשתמש שייך לעסקה
         public async Task Join(int userId, int exchangeId)
         {
             // קודם כל, ודא שהמשתמש שייך לעסקה
@@ -30,7 +32,7 @@ namespace WebAPI.Hubs
             if (!isUserInExchange)
             {
                 // אם המשתמש לא שייך לעסקה, דחה את הצטרפותו
-                await Clients.Caller.SendAsync("ErrorMessage", "You are not part of this exchange.");
+                await Clients.Caller.SendAsync("ErrorMessage", "You are not part of this exchange!");
                 return;
             }
 
