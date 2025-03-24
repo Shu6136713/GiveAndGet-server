@@ -11,18 +11,20 @@ namespace WebAPI.Controllers
     public class ChatController : ControllerBase
     {
         private readonly IChatService _chatService;
+        private readonly ILoginService _loginService;
 
-        public ChatController(IChatService chatService)
+        public ChatController(IChatService chatService, ILoginService loginService)
         {
             _chatService = chatService;
+            _loginService = loginService;
         }
 
         [Authorize]
         [HttpGet("history/{exchangeId}")]
         public async Task<IActionResult> GetChatHistory(int exchangeId)
         {
-
-            var history = await _chatService.GetChatHistoryAsync(exchangeId);
+            int userId = _loginService.GetUserIdFromToken(User);
+            var history = await _chatService.GetChatHistoryAsync(exchangeId, userId);
             return Ok(history);
         }
     }

@@ -55,5 +55,15 @@ namespace Services.Services
             }
             return int.Parse(claim.Value) == userId;
         }
+
+        public int GetUserIdFromToken(ClaimsPrincipal user)
+        {
+            var claim = user.FindFirst(ClaimTypes.NameIdentifier);
+            if (claim == null)
+            {
+                return -1;
+            }
+            return int.Parse(claim.Value);
+        }
     }
 }

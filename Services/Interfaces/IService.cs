@@ -62,6 +62,7 @@ namespace Services.Interfaces
         string GenerateToken(UserDto user);
         UserDto Verify(string name, string pwd);
         bool ValidateUserId(ClaimsPrincipal user, int userId);
+        int GetUserIdFromToken(ClaimsPrincipal user);
 
     }
 

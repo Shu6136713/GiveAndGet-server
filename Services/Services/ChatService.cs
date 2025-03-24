@@ -11,10 +11,12 @@ namespace Services.Services
     public class ChatService : IChatService
     {
         private readonly IMessageExtensionService _messageService;
+        private readonly IExchangeForChat _exchangeService;
 
-        public ChatService(IMessageExtensionService messageService)
+        public ChatService(IMessageExtensionService messageService, IExchangeForChat exchangeService)
         {
             _messageService = messageService;
+            _exchangeService = exchangeService;
         }
 
         public async Task SaveMessageAsync(int exchangeId, int fromUserId, string text)
@@ -29,10 +31,16 @@ namespace Services.Services
             await _messageService.AddItemAsync(msgDto); // שמירה אסינכרונית
         }
 
-        public async Task<List<MessageDto>> GetChatHistoryAsync(int exchangeId)
+        public async Task<List<MessageDto>> GetChatHistoryAsync(int exchangeId, int userId)
         {
-            return await _messageService.GetByExchangeIdAsync(exchangeId); // שליפת היסטוריה של הצ'אט
+            Console.WriteLine(_exchangeService.IsUserInExchangeAsync(userId, exchangeId).Result.ToString());
+            if (_exchangeService.IsUserInExchangeAsync(userId, exchangeId).Result.ToString()== "True")
+            {
+                return await _messageService.GetByExchangeIdAsync(exchangeId); // שליפת היסטוריה של הצ'אט
+            }
+            return null;
         }
+            
     }
 
 

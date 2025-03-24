@@ -10,6 +10,6 @@ namespace Services.Interfaces
     public interface IChatService
     {
         Task SaveMessageAsync(int exchangeId, int fromUserId, string text);
-        Task<List<MessageDto>> GetChatHistoryAsync(int exchangeId);
+        Task<List<MessageDto>> GetChatHistoryAsync(int exchangeId, int userId);
     }
 }
