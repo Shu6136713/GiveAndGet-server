@@ -63,7 +63,7 @@ namespace WebAPI.Controllers
 
         [Authorize]
         [HttpPut("update-status")]
-        public IActionResult UpdateExchangeStatus(int exchangeId, int status)
+        public IActionResult UpdateExchangeStatus(int exchangeId, int status, int userId)
         {
             var exchange = _exchangeService.Get(exchangeId);
             if (exchange == null)
@@ -71,7 +71,7 @@ namespace WebAPI.Controllers
                 return NotFound("Exchange not found.");
             }
 
-            var updatedExchange = _exchangeService.UpdateStatus(exchangeId, (StatusExchangeRep)status);
+            var updatedExchange = _exchangeService.UpdateStatus(exchangeId, (StatusExchangeRep)status,userId);
             return Ok(updatedExchange);
         }
     }

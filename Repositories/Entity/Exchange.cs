@@ -35,5 +35,8 @@ namespace Repositories.Entity
 
         public DateTime DateCreated { get; set; }
         public DateTime? DateCompleted { get; set; }
+
+        public bool User1Confirmed { get; set; } = false;  
+        public bool User2Confirmed { get; set; } = false;  
     }
 }
