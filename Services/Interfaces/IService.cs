@@ -43,7 +43,7 @@ namespace Services.Interfaces
         List<ExchangeDto> GetByUserId(int userId);
         void SearchExchangesForUser(int userId);
         void UpdateUserExchanges(int userId, List<int> removedTalentIds, List<int> addedTalentIds);
-        public ExchangeDto UpdateStatus(int id, StatusExchange status);
+        public ExchangeDto UpdateStatus(int id, StatusExchange status, int userId);
 
 
     }

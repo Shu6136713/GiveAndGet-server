@@ -23,6 +23,7 @@ namespace Services.Services
         private readonly ITalentUserExtensionRepository _talentUserRepo;
         private readonly IMapper _mapper;
 
+
         public ExchangeService(IExchangeExtensionRepository repository,
                                 Repositories.Interfaces.IRepository<User> userRep,  
                                     ITalentUserExtensionRepository talentUserRepo,
@@ -206,9 +207,40 @@ namespace Services.Services
             return exchange.User1Id==userId || exchange.User2Id==userId;
         }
 
-        public ExchangeDto UpdateStatus(int id, StatusExchangeRep status)
+        public ExchangeDto UpdateStatus(int id, StatusExchangeRep status, int userId)
         {
-            var exchange = _repository.UpdateStatus(id, status);
+            if (IsUserInExchangeAsync(userId, id).Result.ToString() != "True")
+            {
+                return null;
+            }
+            var exchange = _repository.Get(id);
+            if (exchange == null) return null;
+
+            if (exchange.User1Id == userId)
+            {
+                exchange.User1Confirmed = true;
+            }
+            else if (exchange.User2Id == userId)
+            {
+                exchange.User2Confirmed = true;
+            }
+
+            if (exchange.Status == StatusExchangeRep.NEW && (exchange.User1Confirmed || exchange.User2Confirmed))
+            {
+                exchange.Status = StatusExchangeRep.WAITING;
+            }
+            else if (exchange.Status == StatusExchangeRep.WAITING && exchange.User1Confirmed && exchange.User2Confirmed)
+            {
+                exchange.Status = StatusExchangeRep.PROCCESSING;
+                exchange.User1Confirmed = false;
+                exchange.User2Confirmed = false;
+            }
+            else if (exchange.Status == StatusExchangeRep.PROCCESSING && exchange.User1Confirmed && exchange.User2Confirmed)
+            {
+                exchange.Status = StatusExchangeRep.DONE;
+            }
+
+            _repository.Update(id, exchange);
             return _mapper.Map<ExchangeDto>(exchange);
         }
     }

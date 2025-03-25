@@ -46,16 +46,20 @@ namespace Repositories.Repositories
 
         public Exchange Update(int id, Exchange entity)
         {
-            Exchange e= Get(id);
-            e.User1Id = entity.User1Id;
-            e.User2Id = entity.User2Id;
-            e.Status= entity.Status;
-            e.Talent1Offered= entity.Talent1Offered;
-            e.Talent2Offered = entity.Talent2Offered;
-            e.DateCompleted= entity.DateCompleted;
-            context.Save();
-            return Get(id);
-
+            var existing = Get(id);
+            if (existing != null)
+            {
+                existing.User1Id = entity.User1Id;
+                existing.User2Id = entity.User2Id;
+                existing.Status = entity.Status;
+                existing.Talent1Offered = entity.Talent1Offered;
+                existing.Talent2Offered = entity.Talent2Offered;
+                existing.DateCompleted = entity.DateCompleted;
+                existing.User1Confirmed = entity.User1Confirmed;
+                existing.User2Confirmed = entity.User2Confirmed;
+                context.Save();
+            }
+            return existing;
         }
 
         public Exchange UpdateStatus(int id, StatusExchange status)
