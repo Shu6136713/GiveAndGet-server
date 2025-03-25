@@ -26,12 +26,12 @@ namespace WebAPI.Controllers
         }
 
         // GET api/<TalentRequestController>/5
-        [Authorize(Roles = "admin")]
-        [HttpGet("{id}")]
-        public TalentRequestDto Get(int id)
-        {
-            return _talentRequestService.Get(id);
-        }
+        //[Authorize(Roles = "admin")]
+        //[HttpGet("{id}")]
+        ////public TalentRequestDto Get(int id)
+        //{
+        //    return _talentRequestService.Get(id);
+        //}
 
         // POST api/<TalentRequestController>
         [HttpPost]

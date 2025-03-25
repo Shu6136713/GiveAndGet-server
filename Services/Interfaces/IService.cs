@@ -56,6 +56,7 @@ namespace Services.Interfaces
         UserDto UpdateUserScore(int id, int action);
         byte[] GetProfileImage(int id);
         List<TopUserDto> GetTopUsers();
+        TopUserDto GetNotSecret(int id);
 
     }
 
@@ -65,7 +66,7 @@ namespace Services.Interfaces
         UserDto Verify(string name, string pwd);
         bool ValidateUserId(ClaimsPrincipal user, int userId);
         int GetUserIdFromToken(ClaimsPrincipal user);
-
+        bool CheckIsAdmin(ClaimsPrincipal user);
     }
 
 

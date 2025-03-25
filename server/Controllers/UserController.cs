@@ -25,17 +25,22 @@ namespace WebAPI.Controllers
         }
 
         // GET: api/<UserController>
-        [HttpGet]
-        public List<UserDto> Get()
-        {
-            return _userService.GetAll();
-        }
+        //[HttpGet]
+        //public List<UserDto> Get()
+        //{
+        //    return _userService.GetAll();
+        //}
 
         // GET api/<UserController>/5
+        [Authorize]
         [HttpGet("{id}")]
         public UserDto Get(int id)
         {
-            return _userService.Get(id);
+            if (_loginService.ValidateUserId(User,id) || _loginService.CheckIsAdmin(User))
+            {
+                return _userService.Get(id);
+            }
+            throw new Exception("you are not allowed fetching foreign user");
         }
 
         [Authorize]
@@ -102,25 +107,6 @@ namespace WebAPI.Controllers
             }
         }
 
-        // DELETE api/<UserController>/5
-        [Authorize]
-        [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
-        {
-            try
-            {
-                if (!_loginService.ValidateUserId(User, id))
-                {
-                    return Unauthorized("User ID does not match the token.");
-                }
-                _userService.Delete(id);
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"An error occurred: {ex.Message}");
-            }
-        }
 
         [HttpGet("profile-image/{id}")]
         public IActionResult GetProfileImage(int id)
@@ -155,6 +141,13 @@ namespace WebAPI.Controllers
         public List<TopUserDto> GetTopUsers()
         {
             return _userService.GetTopUsers();
+        }
+
+        [Authorize]
+        [HttpGet("not-secret/{id}")]
+        public TopUserDto GetNotSecret(int id)
+        {
+            return _userService.GetNotSecret(id);
         }
     }
 }

@@ -346,5 +346,16 @@ namespace Services.Services
 
             return _mapper.Map<List<TopUserDto>>(topUsers);
         }
+
+        public TopUserDto GetNotSecret(int id)
+        {
+            User u = _repository.Get(id);
+            if (u == null)
+            {
+                throw new ArgumentException("user not found");
+            }
+            UserDto user = _mapper.Map<UserDto>(u);
+            return new TopUserDto(user.UserName, user.Score, user.Desc, user.Profile);
+        }
     }
 }

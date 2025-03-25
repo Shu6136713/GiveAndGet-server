@@ -65,5 +65,10 @@ namespace Services.Services
             }
             return int.Parse(claim.Value);
         }
+
+        public bool CheckIsAdmin(ClaimsPrincipal user)
+        {
+            return user.FindFirst(ClaimTypes.Role).Value == "admin";
+        }
     }
 }

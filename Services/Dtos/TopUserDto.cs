@@ -8,6 +8,16 @@ namespace Services.Dtos
 {
     public class TopUserDto
     {
+        private string? profile;
+
+        public TopUserDto(string userName, int score, string desc, string? profile)
+        {
+            UserName = userName;
+            Score = score;
+            Desc = desc;
+            ProfileImageUrl = profile;
+        }
+
         public string UserName { get; set; }
         public int Score { get; set; }
         public string Desc { get; set; }

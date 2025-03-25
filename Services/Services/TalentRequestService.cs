@@ -56,21 +56,21 @@ namespace Services.Services
             return _mapper.Map<TalentRequestDto>(_repository.Update(id, _mapper.Map<TalentRequest>(item)));
         }
 
-        private void NotifyAdmins(string subject, string body)
-        {
-            List<UserDto> adminUsers = _userService.GetAll().Where(user => (bool)user.IsAdmin).ToList();
-            foreach (UserDto admin in adminUsers)
-            {
-                try
-                {
-                    _emailService.SendEmail(subject, body, admin.Email);
-                }
-                catch (Exception ex)
-                {
-                    // הודעת שגיאה במקרה של כשלון בשליחת המייל
-                    Console.WriteLine($"Error sending email to {admin.Email}: {ex.Message}");
-                }
-            }
-        }
+        //private void NotifyAdmins(string subject, string body)
+        //{
+        //    List<UserDto> adminUsers = _userService.GetAll().Where(user => (bool)user.IsAdmin).ToList();
+        //    foreach (UserDto admin in adminUsers)
+        //    {
+        //        try
+        //        {
+        //            _emailService.SendEmail(subject, body, admin.Email);
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            // הודעת שגיאה במקרה של כשלון בשליחת המייל
+        //            Console.WriteLine($"Error sending email to {admin.Email}: {ex.Message}");
+        //        }
+        //    }
+        //}
     }
 }

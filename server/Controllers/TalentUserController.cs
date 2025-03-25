@@ -19,21 +19,21 @@ namespace YourNamespace.Controllers
             _loginService = loginService;
         }
 
-        [Authorize]
-        [HttpPost("addTalents")]
-        public ActionResult<List<TalentUserDto>> AddTalentsForUser([FromBody] List<TalentUserDto> talents)
-        {
-            if (talents == null || !talents.Any())
-                return BadRequest("The talent list cannot be empty.");
+        //[Authorize]
+        //[HttpPost("addTalents")]
+        //public ActionResult<List<TalentUserDto>> AddTalentsForUser([FromBody] List<TalentUserDto> talents)
+        //{
+        //    if (talents == null || !talents.Any())
+        //        return BadRequest("The talent list cannot be empty.");
 
-            if (!_loginService.ValidateUserId(User, talents.First().UserId))
-            {
-                return Unauthorized("User ID does not match the token.");
-            }
+        //    if (!_loginService.ValidateUserId(User, talents.First().UserId))
+        //    {
+        //        return Unauthorized("User ID does not match the token.");
+        //    }
 
-            var updatedTalents = _talentUserService.AddTalentsForUser(talents);
-            return Ok(updatedTalents);
-        }
+        //    var updatedTalents = _talentUserService.AddTalentsForUser(talents);
+        //    return Ok(updatedTalents);
+        //}
 
         [Authorize]
         [HttpGet("getTalents/{userId}")]
@@ -50,45 +50,45 @@ namespace YourNamespace.Controllers
             return Ok(talents);
         }
 
-        [Authorize]
-        [HttpPost("addTalent")]
-        public ActionResult<TalentUserDto> AddTalent([FromBody] TalentUserDto talent)
-        {
-            if (talent == null)
-                return BadRequest("Talent data is required.");
+        //[Authorize]
+        //[HttpPost("addTalent")]
+        //public ActionResult<TalentUserDto> AddTalent([FromBody] TalentUserDto talent)
+        //{
+        //    if (talent == null)
+        //        return BadRequest("Talent data is required.");
 
-            if (!_loginService.ValidateUserId(User, talent.UserId))
-            {
-                return Unauthorized("User ID does not match the token.");
-            }
+        //    if (!_loginService.ValidateUserId(User, talent.UserId))
+        //    {
+        //        return Unauthorized("User ID does not match the token.");
+        //    }
 
 
-            var addedTalent = _talentUserService.AddItem(talent);
-            return Ok(addedTalent);
-        }
+        //    var addedTalent = _talentUserService.AddItem(talent);
+        //    return Ok(addedTalent);
+        //}
 
-        [Authorize]
-        [HttpDelete("delete/{id}")]
-        public IActionResult DeleteTalent(int id)
-        {
-            _talentUserService.Delete(id);
-            return NoContent();
-        }
+        //[Authorize]
+        //[HttpDelete("delete/{id}")]
+        //public IActionResult DeleteTalent(int id)
+        //{
+        //    _talentUserService.Delete(id);
+        //    return NoContent();
+        //}
 
-        [Authorize]
-        [HttpPut("update/{id}")]
-        public ActionResult<TalentUserDto> UpdateTalent(int id, [FromBody] TalentUserDto talent)
-        {
-            if (talent == null)
-                return BadRequest("Talent data is required.");
+        //[Authorize]
+        //[HttpPut("update/{id}")]
+        //public ActionResult<TalentUserDto> UpdateTalent(int id, [FromBody] TalentUserDto talent)
+        //{
+        //    if (talent == null)
+        //        return BadRequest("Talent data is required.");
 
-            if (!_loginService.ValidateUserId(User, talent.UserId))
-            {
-                return Unauthorized("User ID does not match the token.");
-            }
+        //    if (!_loginService.ValidateUserId(User, talent.UserId))
+        //    {
+        //        return Unauthorized("User ID does not match the token.");
+        //    }
 
-            var updatedTalent = _talentUserService.Update(id, talent);
-            return Ok(updatedTalent);
-        }
+        //    var updatedTalent = _talentUserService.Update(id, talent);
+        //    return Ok(updatedTalent);
+        //}
     }
 }
