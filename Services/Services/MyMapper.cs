@@ -34,6 +34,10 @@ namespace Services.Services
             CreateMap<Talent, TalentDto>().ReverseMap();
             CreateMap<TalentRequest, TalentRequestDto>().ReverseMap();
             CreateMap<TalentUser, TalentUserDto>().ReverseMap();
+            CreateMap<User, TopUserDto>()
+                .ForMember(dest => dest.ProfileImageUrl,
+                    opt => opt.MapFrom(src => src.ProfileImage != null ? $"/api/User/profile-image/{src.Id}" : null));
+
         }
     }
 }

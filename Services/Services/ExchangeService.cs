@@ -100,6 +100,7 @@ namespace Services.Services
             {
                 List<TalentUser> potentialPartners = allTalentUsers
                     .Where(t => t.TalentId == talent.TalentId && t.IsOffered != talent.IsOffered && t.UserId != userId)
+                    .OrderByDescending(t => _userRepo.Get(t.UserId).Score)
                     .ToList();
 
                 foreach (TalentUser partner in potentialPartners)

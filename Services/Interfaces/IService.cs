@@ -55,6 +55,8 @@ namespace Services.Interfaces
         UserDto UpdateUser(int id, UserDto updateUser, string talents);
         UserDto UpdateUserScore(int id, int action);
         byte[] GetProfileImage(int id);
+        List<TopUserDto> GetTopUsers();
+
     }
 
     public interface ILoginService

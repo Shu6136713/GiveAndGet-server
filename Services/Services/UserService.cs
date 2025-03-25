@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using Repositories.Entity;
 using Repositories.Interfaces;
+using Repositories.Repositories;
 using Services.Dtos;
 using Services.Interfaces;
 using System;
@@ -22,6 +23,8 @@ namespace Services.Services
         private readonly IExchangeExtensionService _exchangeService;
         private readonly ITalentExtensionService _talentService;
         public static string _directory = Path.Combine(Environment.CurrentDirectory, "Images");
+        private const int TOP_USERS_COUNT = 10;
+
 
         public UserService(IRepository<User> repository,
                            IMapper mapper,
@@ -318,9 +321,9 @@ namespace Services.Services
 
         private void ValidateAge(int age)
         {
-            if (age < 0 || age > 120)
+            if (age < 7 || age > 120)
             {
-                throw new ArgumentException("Age must be between 0 and 120.");
+                throw new ArgumentException("Age must be between 7 and 120.");
             }
         }
 
@@ -330,6 +333,18 @@ namespace Services.Services
             {
                 throw new ArgumentException("Invalid gender.");
             }
+        }
+
+        public List<TopUserDto> GetTopUsers()
+        {
+            var users = _repository.GetAll();
+
+            var topUsers = users
+                .OrderByDescending(u => u.Score)
+                .Take(TOP_USERS_COUNT)
+                .ToList();
+
+            return _mapper.Map<List<TopUserDto>>(topUsers);
         }
     }
 }

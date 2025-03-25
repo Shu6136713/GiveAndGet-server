@@ -150,5 +150,11 @@ namespace WebAPI.Controllers
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
         }
+
+        [HttpGet("top")]
+        public List<TopUserDto> GetTopUsers()
+        {
+            return _userService.GetTopUsers();
+        }
     }
 }
