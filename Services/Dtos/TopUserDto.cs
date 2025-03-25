@@ -10,6 +10,10 @@ namespace Services.Dtos
     {
         private string? profile;
 
+        public TopUserDto()
+        {
+
+        }
         public TopUserDto(string userName, int score, string desc, string? profile)
         {
             UserName = userName;

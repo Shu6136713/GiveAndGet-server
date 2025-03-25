@@ -172,6 +172,7 @@ namespace Services.Services
         {
             // שליפת כל העסקאות של המשתמש
             List<Exchange> userExchanges = _repository.GetByUserId(userId);
+            Console.WriteLine();
 
             // איתור עסקאות חדשות או עסקאות שממתינות לתגובה שכוללות כישרונות שהוסרו
             List<Exchange> exchangesToDelete = userExchanges
