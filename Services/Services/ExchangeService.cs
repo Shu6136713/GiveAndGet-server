@@ -172,12 +172,11 @@ namespace Services.Services
         {
             // שליפת כל העסקאות של המשתמש
             List<Exchange> userExchanges = _repository.GetByUserId(userId);
-            Console.WriteLine();
 
-            // איתור עסקאות חדשות או עסקאות שממתינות לתגובה שכוללות כישרונות שהוסרו
+            // איתור עסקאות חדשות או ממתינות שמכילות כישרונות שהוסרו
             List<Exchange> exchangesToDelete = userExchanges
-                .Where(e => e.Status.Equals(StatusExchange.NEW) || e.Status.Equals(StatusExchange.WAITING))
-                .Where(e => removedTalentIds.Contains(e.Talent1Offered) || removedTalentIds.Contains(e.Talent2Offered))
+                .Where(e => ((StatusExchange)e.Status == StatusExchange.NEW || (StatusExchange)e.Status == StatusExchange.WAITING) &&
+                            (removedTalentIds.Contains(e.Talent1Offered) || removedTalentIds.Contains(e.Talent2Offered)))
                 .ToList();
 
             // מחיקת העסקאות שמצאנו
@@ -186,8 +185,10 @@ namespace Services.Services
                 _repository.Delete(exchange.Id);
             }
 
+            // חיפוש עסקאות חדשות אפשריות
             SearchExchangesForUser(userId);
         }
+
 
 
 
