@@ -4,6 +4,7 @@ using MimeKit;
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using Services.Interfaces;
+using System.Net;
 
 namespace Services.Services
 {
@@ -44,6 +45,7 @@ namespace Services.Services
                         Console.WriteLine("Attempting to connect to SMTP server...");
 
                         // חיבור לשרת SMTP של Mailjet
+                        ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
                         smtpClient.Connect("in-v3.mailjet.com", 587, SecureSocketOptions.StartTls);
 
                         // הוספת לוג אחרי החיבור
