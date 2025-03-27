@@ -23,7 +23,7 @@ namespace Services.Services
         private readonly IExchangeExtensionService _exchangeService;
         private readonly ITalentExtensionService _talentService;
         public static string _directory = Path.Combine(Environment.CurrentDirectory, "Images");
-        private const int TOP_USERS_COUNT = 10;
+        private const int TOP_USERS_COUNT = 5;
 
 
         public UserService(IRepository<User> repository,

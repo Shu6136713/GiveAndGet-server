@@ -60,7 +60,14 @@ namespace Services.Interfaces
 
     }
 
-    
+    public interface ITalentRequestService:IService<TalentRequestDto>
+    {
+        TalentRequestDto CreateTalentRequest(TalentRequestDto item);
+        void ProcessTalentRequest(int id, TalentRequestDto toUpdate);
+        void DeleteTalentRequest(int id);
+    }
+
+
 
 
 }

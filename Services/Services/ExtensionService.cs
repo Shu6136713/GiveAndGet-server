@@ -30,6 +30,8 @@ namespace Services.Services
             services.AddScoped<IChatService, ChatService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<ILoginService, LoginService>();
+            services.AddScoped<ITalentRequestService, TalentRequestService>();
+            
 
             services.AddAutoMapper(typeof(MyMapper));
 
