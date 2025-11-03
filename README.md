@@ -70,8 +70,17 @@
 
 GiveAndGet demonstrates how **complex and professional software development** can combine creativity, smart design, and social awareness to deliver **meaningful value** to users. It highlights technical skill, originality, and a commitment to contributing positively to the community.
 
-
 ---
+
+## 👩‍💻 Developers
+
+**Shulamit Halbershtadt**
+📫 [GitHub Profile](https://github.com/Shu6136713)
+
+**Racheli Cohen** 
+📫 [GitHub Profile](https://github.com/Racheli76)
+
+
 
 ---
 
@@ -149,3 +158,17 @@ GiveAndGet demonstrates how **complex and professional software development** ca
 ## סיכום
 
 GiveAndGet ממחיש כיצד **פיתוח תוכנה מורכב ומקצועי** יכול לשלב יצירתיות, חשיבה חכמה והבנה חברתית, ולהביא **ערך משמעותי למשתמשים**. הפרויקט מדגיש כישורים טכנולוגיים, מקוריות, ויכולת לתרום לקהילה באופן ממשי.
+
+## מפתחים 👩‍💻
+
+**Shulamit Halbershtadt**
+📫 [GitHub Profile](https://github.com/Shu6136713)
+
+**Racheli Cohen** 
+📫 [GitHub Profile](https://github.com/Racheli76)
+
+
+
+
+
+
