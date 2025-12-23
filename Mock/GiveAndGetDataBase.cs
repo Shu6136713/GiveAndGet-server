@@ -28,7 +28,7 @@ namespace Mock
 
 
 
-        // אין צורך ב-OnConfiguring כאשר משתמשים ב-Dependency Injection
+        //when using Dependency Injection OnConfiguring is not needed
 
         public void Save()
         {
@@ -46,7 +46,7 @@ namespace Mock
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // הגדרת אינדקסים ייחודיים עבור המודל User
+            // unique indexes for the models
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.UserName)
                 .IsUnique();
