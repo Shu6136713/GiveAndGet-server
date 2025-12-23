@@ -74,7 +74,7 @@ GiveAndGet demonstrates how **complex and professional software development** ca
 
 ## 👩‍💻 Developers
 
-**Shulamit Halbershtadt**
+**Shulamit Halberstadt**
 📫 [GitHub Profile](https://github.com/Shu6136713)
 
 **Racheli Cohen** 
@@ -161,7 +161,7 @@ GiveAndGet ממחיש כיצד **פיתוח תוכנה מורכב ומקצועי
 
 ## מפתחים 👩‍💻
 
-**Shulamit Halbershtadt**
+**Shulamit Halberstadt**
 📫 [GitHub Profile](https://github.com/Shu6136713)
 
 **Racheli Cohen** 
