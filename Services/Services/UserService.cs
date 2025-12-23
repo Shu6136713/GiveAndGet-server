@@ -92,15 +92,15 @@ namespace Services.Services
 
             string pwd = user.HashPwd;
 
-            // בדיקה אם הסיסמא תקינה
+            // check if the password is valid
             if (!CheckIfValidatePwd(pwd))
                 throw new ArgumentException("Password must contain upper and lower case letters, numbers, and special characters.");
 
-            // חישוב סיסמא מוצפנת
+            // hashing pwd
             string hashPwd = PasswordManagerService.HashPassword(pwd);
             user.HashPwd = hashPwd;
 
-            // טיפול בתמונה של פרופיל
+            // manage profile img
             if (user.File != null)
             {
                 if (!Directory.Exists(_directory))
@@ -115,10 +115,10 @@ namespace Services.Services
                 user.Profile = user.File.FileName;
             }
 
-            // הוספת משתמש
+            // add user
             UserDto newUser = AddItem(user);
 
-            // הוספת כישרונות למשתמש אם יש
+            // add talents to the user if exits
             if (talents != "[]")
             {
                 List<TalentUserDto> talentList = JsonConvert.DeserializeObject<List<TalentUserDto>>(talents);
@@ -138,7 +138,7 @@ namespace Services.Services
             ValidateUser(updateUser);
 
 
-            // אם המשתמש מעדכן סיסמה, מבצעים בדיקות ואימות
+            // if password is updated, validate it
             if (!string.IsNullOrEmpty(updateUser.HashPwd))
             {
                 if (!CheckIfValidatePwd(updateUser.HashPwd))
@@ -147,7 +147,7 @@ namespace Services.Services
                 updateUser.HashPwd = PasswordManagerService.HashPassword(updateUser.HashPwd);
             }
 
-            // אם המשתמש מעלה תמונת פרופיל חדשה, שומרים אותה בשרת
+            // if a profile img is updated- put the new in the server
             if (updateUser.File != null)
             {
                 var filePath = Path.Combine(_directory, updateUser.File.FileName);
@@ -158,24 +158,24 @@ namespace Services.Services
                 updateUser.Profile = updateUser.File.FileName;
             }
 
-            // שליפת רשימת הכישרונות הנוכחית של המשתמש מהמערכת
+            //get the current talents list of the user
             var currentTalents = _talentUserService.GetTalentsByUserId(id)
                                   .Select(t => t.TalentId).ToList();
 
-            // המרת המחרוזת JSON שהתקבלה לרשימת כישרונות המשתמש
+            // Convert the received JSON string to a list of user talents
             List<TalentUserDto> talentUserList_new = !string.IsNullOrEmpty(talents) ?
                 JsonConvert.DeserializeObject<List<TalentUserDto>>(talents) : new List<TalentUserDto>();
 
-            // רשימת ה- TalentId החדשה לאחר הסינון
+            // The new TalentId list after filtering
             var newTalents = talentUserList_new.Select(t => t.TalentId).Distinct().ToList();
 
-            // זיהוי כישרונות שנמחקו (היו בעבר אך לא ברשימה החדשה)
+            // detect deleted talents (were exist, not exist in the new list)
             var removedTalentIds = currentTalents.Except(newTalents).ToList();
 
-            // זיהוי כישרונות חדשים (נמצאים ברשימה החדשה אך לא היו בעבר)
+            // detect new talents (were not exist, exist in the new list)
             var addedTalentIds = newTalents.Except(currentTalents).ToList();
 
-            // זיהוי כישרונות שהיו קיימים אך ייתכן והסטטוס שלהם (IsOffered) השתנה
+            // detect talents that existed but whose status (IsOffered) may have changed
             var existingTalents = currentTalents.Intersect(newTalents).ToList();
             foreach (var talentId in existingTalents)
             {
@@ -186,13 +186,13 @@ namespace Services.Services
                 }
             }
 
-            // מחיקת הכישרונות שהוסרו מהרשימה
+            // delete the deleted talents
             foreach (var talentId in removedTalentIds)
             {
                 _talentUserService.Delete(id, talentId);
             }
 
-            // הוספת כישרונות חדשים (אם יש כאלו)
+            // add the new if there are
             if (addedTalentIds.Any())
             {
                 var addedTalents = talentUserList_new
@@ -203,10 +203,10 @@ namespace Services.Services
                 _talentUserService.AddTalentsForUser(addedTalents);
             }
 
-            // עדכון פרטי המשתמש במערכת
+            // update the user details
             UserDto updatedUser = Update(id, updateUser);
 
-            // עדכון עסקאות בהתאם לכישרונות שנוספו ונמחקו
+            // update exchanges according to the talents' changes
             _exchangeService.UpdateUserExchanges(id, removedTalentIds, addedTalentIds);
 
             return updatedUser;
@@ -220,21 +220,21 @@ namespace Services.Services
                 throw new KeyNotFoundException($"User with ID {id} not found.");
             }
 
-            // נקודות להוספה או הפחתה
+            // points to increase or decrease
             int pointsToChange = 0;
 
             switch (action)
             {
-                case 0: // הורדת נקודות
+                case 0: // decrease
                     pointsToChange = -5;
                     break;
-                case 1: // הוספת נקודות
+                case 1: // increase
                     pointsToChange = 10;
                     break;
-                case 2: // ביטול הורדה
+                case 2: // cancel decreasment
                     pointsToChange = 5;
                     break;
-                case 3: // ביטול העלאה
+                case 3: // cancel increasment
                     pointsToChange = -10;
                     break;
                 default:
@@ -242,8 +242,8 @@ namespace Services.Services
             }
 
             user.Score += pointsToChange;
-            if (user.Score < 0) user.Score = 0; // לוודא שהניקוד לא יהיה פחות מ-0
-
+            if (user.Score < 0) user.Score = 0; // ensure that score won't be less than 0
+            
             _repository.Update(id, user);
             return _mapper.Map<UserDto>(user);
         }
